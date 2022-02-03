@@ -14,6 +14,8 @@ One can predict the wordle of the day only from public tweets. This is an altern
 
 I can't decide if this is the coolest way to "solve" wordle or the dumbest. Obviously it's sort of cheating, but it's cheating with statistics in a neat way. I think it's pretty cool it works.
 
+Storing tweets is [complicated](https://developer.twitter.com/en/developer-terms/agreement-and-policy), so best to [download the data from kaggle](https://www.kaggle.com/benhamner/wordle-tweets), I'm not hosting any tweets here.
+
 Major differences from above Kaggle notebook:
 
 * **No simulations of hypothetical games.** I do use a similar word commonality lookup dictionary.
