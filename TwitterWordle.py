@@ -11,9 +11,16 @@ def flatten_list(list_of_lists):
 
 
 class TwitterWordle():
-    def __init__(self, tweet_df=None):
-        self.zipped_counters = pickle.load(
-            open("zipped_counters2.pickle", "rb"))
+    def __init__(self, tweet_df=None, use_limited_targets=True):
+        if use_limited_targets:
+            self.zipped_counters = pickle.load(
+                open("zipped_counters2.pickle", "rb"))
+        else:
+            self.zipped_counters = pickle.load(
+                open("zipped_counters_allwords.pickle", "rb"))
+        print(
+            f"Loaded {len(self.zipped_counters)} pre-computed lookup dictionaries."
+        )
         if tweet_df is not None:
             assert isinstance(tweet_df, pd.DataFrame), 'Must be a dataframe'
         self.tweet_df = tweet_df

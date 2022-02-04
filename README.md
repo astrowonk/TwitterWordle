@@ -22,6 +22,7 @@ Major differences from above Kaggle notebook:
 * **No cosine similarity or comparison of specific (e.g. penultimate) guess.** Only the list, and to some extent count, of all tweeted wordle score lines is needed.
 * **No explicit filtering of spurious tweets.** The kaggle data set does some [light filtering](https://www.kaggle.com/benhamner/pull-wordle-tweets), however when I collect them myself, I do not pre-process the search results from the Twitter API. I think using a minimum count threshold mostly eliminates a few fake or spurious scores that were posted.
 * **100% Accuracy** This algorithm has 100% accuracy from Wordles 210-228 (the Kaggle project initially failed on 223, though it looks like it was successful on later reruns.)
+* **By default, the code only considers the known 2315 possible wordles.** The Kaggle project doesn't give it special treatment, so it is considering all 12K words as possible answers. While my [wordlebot](https://github.com/astrowonk/wordle) has rolled its own dictionary, I used the actual wordle list here. Fortunately, it works even without limiting its scope in this way. Use the keyword `use_limited_targets = False` to solve with the full 12972 word list.
 
 The `solve` method of the main class returns an image of the top candidate scores, here is Wordle 223:
 
