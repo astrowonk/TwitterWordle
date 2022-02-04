@@ -18,9 +18,9 @@ Storing tweets is [complicated](https://developer.twitter.com/en/developer-terms
 
 Major differences from above Kaggle notebook:
 
-* **No simulations of hypothetical games.** I do use a similar word commonality lookup dictionary, and the same word frequency data.
+* **No simulations of hypothetical games.** I do use a similar word commonality lookup dictionary, and the same [word frequency data](https://www.kaggle.com/rtatman/english-word-frequency).
 * **No cosine similarity or comparison of specific (e.g. penultimate) guess.** Only the list, and to some extent count, of all tweeted wordle score lines is needed.
-* **No explicit filtering of spurious tweets.** The kaggle data set does some [light filtering](https://www.kaggle.com/benhamner/pull-wordle-tweets), however when I collect them myself, I do no pre-processing. For large N of tweets, a min-count threshold is used to remove false or impossible line scores. For small N, the penalty term is small enough that 1 or 2 false lines won't impact the final result. I suppose the risk is someone who might put the results for several wordles in one tweet, but so far it hasn't been an issue.
+* **No explicit filtering of spurious tweets.** The kaggle data set does some [light filtering](https://www.kaggle.com/benhamner/pull-wordle-tweets), however when I collect them myself, I do not pre-process the search results from the Twitter API. I think using a minimum count threshold mostly eliminates a few people who create fake or spurious scores to tweet.
 * **100% Accuracy** This algorithm has 100% accuracy from Wordles 210-228.
 
 The `solve` method of the main class returns an image of the top candidate scores, here is Wordle 223:
