@@ -72,10 +72,9 @@ class TwitterWordle():
 
     @staticmethod
     def wordle_guesses(tweet):
-        text = (tweet.replace("Y", "y").replace("🟩", "2").replace(
-            "M", "m").replace("🟨",
-                              "1").replace("N",
-                                           "n").replace("⬛",
+        text = (tweet.replace("🟩",
+                              "2").replace("🟨",
+                                           "1").replace("⬛",
                                                         "0").replace("⬜", "0"))
         guesses = re.findall("([012]{5})", text)
         return guesses
