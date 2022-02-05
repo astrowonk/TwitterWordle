@@ -10,7 +10,7 @@ More details in the Jupyter Notetbooks:
 
 ### Discussion
 
-One can predict the wordle of the day only from public tweets. This is an alternative and maybe a little simpler approach than this excellent [Kaggle project](https://www.kaggle.com/benhamner/wordle-1-6).
+The `TwitterWordle` class here can predict the wordle of the day only from public tweets. This is an alternative and maybe a little simpler approach than this excellent [Ben Hamner's Kaggle project](https://www.kaggle.com/benhamner/wordle-1-6).
 
 I can't decide if this is the coolest way to "solve" wordle or the dumbest. Obviously don't use this to "play" wordle because that's not fun, but it's pretty neat one can infer the answer just for all the tweets out there.
 
