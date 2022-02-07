@@ -10,6 +10,12 @@ def flatten_list(list_of_lists):
     return [y for x in list_of_lists for y in x]
 
 
+def check_match(x):
+    if re.search(r"Wordle \d{3}", x):
+        return True
+    return False
+
+
 class TwitterWordle():
     def __init__(self, tweet_df=None, use_limited_targets=True):
         if use_limited_targets:
@@ -24,6 +30,9 @@ class TwitterWordle():
         if tweet_df is not None:
             assert isinstance(tweet_df, pd.DataFrame), 'Must be a dataframe'
         self.tweet_df = tweet_df
+        if self.tweet_df is not None:
+            self.tweet_df = self.tweet_df.loc[tweet_df['tweet_text'].apply(
+                check_match)]
 
     @staticmethod
     def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=5):
@@ -62,9 +71,12 @@ class TwitterWordle():
                 print(
                     f"{len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for wordle {wordle_num}"
                 )
-            return flatten_list(
-                (self.tweet_df.query(f'wordle_id == {wordle_num}')
-                 ['tweet_text'].apply(self.wordle_guesses)).tolist())
+            return flatten_list([
+                x
+                for x in (self.tweet_df.query(f'wordle_id == {wordle_num}')
+                          ['tweet_text'].apply(self.wordle_guesses)).tolist()
+                if len(x) <= 6
+            ])
 
         return flatten_list((self.tweet_df.query(f'wordle_id == {wordle_num}')
                              ['tweet_text'].apply(self.wordle_guesses)).sample(
@@ -93,6 +105,7 @@ class TwitterWordle():
             the_guesses = [
                 x for x in all_guesses if x not in ('22222', '00000')
             ]
+
         c = Counter(the_guesses)
         if not min_count:
             min_count = np.floor(np.quantile(list(c.values()), .25))
@@ -136,7 +149,7 @@ class TwitterWordle():
         elif tweet_list:
             print(f"{len(tweet_list)} tweets")
             score_guess_list = flatten_list(
-                [self.wordle_guesses(x) for x in tweet_list])
+                [self.wordle_guesses(x) for x in [x for x in tweet_list if check_match(x)]])
 
         prediction, sigma, data, delta_above_two = self.solve_guess_list(
             score_guess_list,
@@ -148,12 +161,15 @@ class TwitterWordle():
             print(
                 f'Wordle {wordle_num} initial signal low {delta_above_two:1.3}. Iterating for better parameters'
             )
+
             for my_min_count in range(max(min_count - 2, 1), min_count + 10,
                                       2):
                 if delta_above_two > 1.1:
                     continue
 
                 for p in range(-7, -100, -2):
+                    print(".", end="")
+
                     penalty_term = p * 1E7
                     if delta_above_two > 1.1:
                         continue
@@ -167,7 +183,7 @@ class TwitterWordle():
                     iterated_results.append(
                         (prediction, sigma, data, delta_above_two))
             print(
-                f"Iterated to a better signal with min_count {final_min_count} and penalty {final_penalty_term:.2E}"
+                f"\nIterated to a better signal with min_count {final_min_count} and penalty {final_penalty_term:.2E}"
             )
         if delta_above_two < 1.1 and iterate_low_score:
             prediction, sigma, data, delta_above_two = sorted(
