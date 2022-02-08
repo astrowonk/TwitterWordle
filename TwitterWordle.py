@@ -78,9 +78,12 @@ class TwitterWordle():
                 if len(x) <= 6
             ])
 
-        return flatten_list((self.tweet_df.query(f'wordle_id == {wordle_num}')
-                             ['tweet_text'].apply(self.wordle_guesses)).sample(
-                                 downsample, random_state=42).tolist())
+        return flatten_list([
+            x for x in (self.tweet_df.query(f'wordle_id == {wordle_num}')
+                        ['tweet_text'].apply(self.wordle_guesses)
+                        ).sample(downsample, random_state=42).tolist()
+            if len(x) <= 6
+        ])
 
     @staticmethod
     def wordle_guesses(tweet):
