@@ -35,7 +35,7 @@ class TwitterWordle():
                 check_match)]
 
     @staticmethod
-    def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=5):
+    def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=3):
         """process the counter of the tweet guesses vs the target word dictionary. A penalty term will reduce the score of
         impossible guesses for the target word but shouldn't penalize the true word if a few tweets are spurious.
         
@@ -133,7 +133,7 @@ class TwitterWordle():
               tweet_list=None,
               plot=True,
               downsample=None,
-              min_count=5,
+              min_count=3,
               iterate_low_score=True,
               exclude_misses=False,
               return_full_plot=False,
@@ -148,8 +148,10 @@ class TwitterWordle():
                                                         downsample=downsample)
         elif tweet_list:
             print(f"{len(tweet_list)} tweets")
-            score_guess_list = flatten_list(
-                [self.wordle_guesses(x) for x in [x for x in tweet_list if check_match(x)]])
+            score_guess_list = flatten_list([
+                self.wordle_guesses(x)
+                for x in [x for x in tweet_list if check_match(x)]
+            ])
 
         prediction, sigma, data, delta_above_two = self.solve_guess_list(
             score_guess_list,
