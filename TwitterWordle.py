@@ -215,7 +215,7 @@ class TwitterWordle():
             f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
         )
         print(
-            f"Solution match is {help_hash(prediction) == self.solution_dict[str(wordle_num)]}"
+            f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
         )
 
         return help_hash(prediction)
