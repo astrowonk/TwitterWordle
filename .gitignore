@@ -1,0 +1,14 @@
+
+.ipynb_checkpoints
+*.parquet
+*.pyc
+*.ipynb
+!Create Lookup dictionary.ipynb
+!recent_tweets.parquet
+!Predict with Tweets.ipynb
+*.csv
+recent_tweets.parquet
+*.txt
+!unigram_freq.csv
+!dontlook.txt
+!wordle-dictionary-full.txt
