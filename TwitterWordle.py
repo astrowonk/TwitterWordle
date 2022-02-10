@@ -4,6 +4,12 @@ from collections import Counter
 import pandas as pd
 import numpy as np
 import re
+import hashlib
+import json
+
+
+def help_hash(x):
+    return hashlib.sha256(x.encode()).hexdigest()
 
 
 def flatten_list(list_of_lists):
@@ -33,6 +39,8 @@ class TwitterWordle():
         if self.tweet_df is not None:
             self.tweet_df = self.tweet_df.loc[tweet_df['tweet_text'].apply(
                 check_match)]
+        with open("hashed_lookup.json", "r") as data_file:
+            self.solution_dict = json.load(data_file)
 
     @staticmethod
     def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=3):
@@ -134,12 +142,13 @@ class TwitterWordle():
     def solve(self,
               wordle_num=None,
               tweet_list=None,
-              plot=True,
+              plot=False,
               downsample=None,
               min_count=3,
               iterate_low_score=True,
               exclude_misses=False,
               return_full_plot=False,
+              print_unmasked_answer=False,
               **kwargs):
         """Can extract a tweet from self.tweet_df or process a list of tweets"""
 
@@ -194,13 +203,22 @@ class TwitterWordle():
             prediction, sigma, data, delta_above_two = sorted(
                 iterated_results, key=lambda x: x[3])[-1]
 
-        print(
-            f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
-        )
         if plot:
             if not return_full_plot:
                 return data.sort_values().tail(20).plot.bar()
-            return data.sort_values().plot.bar()
+            return data.sort_values().plot.bar(), prediction
+        if print_unmasked_answer:
+            print(
+                f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
+            )
+        print(
+            f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
+        )
+        print(
+            f"Solution match is {help_hash(prediction) == self.solution_dict[str(wordle_num)]}"
+        )
+
+        return help_hash(prediction)
 
     def solve_all(self, **kwargs):
         if self.tweet_df is not None:
