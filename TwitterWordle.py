@@ -217,7 +217,10 @@ class TwitterWordle():
         print(
             f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
         )
-
+        plot_data = data.sort_values().tail(20)
+        plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
+        fig = plot_data.plot(kind='bar')
+        fig.show()
         return help_hash(prediction)
 
     def solve_all(self, **kwargs):
