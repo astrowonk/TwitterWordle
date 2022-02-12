@@ -4,6 +4,12 @@ from collections import Counter
 import pandas as pd
 import numpy as np
 import re
+import hashlib
+import json
+
+
+def help_hash(x):
+    return hashlib.sha256(x.encode()).hexdigest()
 
 
 def flatten_list(list_of_lists):
@@ -33,6 +39,8 @@ class TwitterWordle():
         if self.tweet_df is not None:
             self.tweet_df = self.tweet_df.loc[tweet_df['tweet_text'].apply(
                 check_match)]
+        with open("hashed_lookup.json", "r") as data_file:
+            self.solution_dict = json.load(data_file)
 
     @staticmethod
     def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=3):
@@ -69,7 +77,7 @@ class TwitterWordle():
         if not downsample:
             if verbose:
                 print(
-                    f"{len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for wordle {wordle_num}"
+                    f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}"
                 )
             return flatten_list([
                 x
@@ -114,7 +122,7 @@ class TwitterWordle():
             min_count = np.floor(np.quantile(list(c.values()), .25))
         if verbose:
             print(
-                f"{len(the_guesses)} guess scores. {len(set(all_guesses))} unique. Min count : {min_count}"
+                f"{len(the_guesses)} guess scores. {len(set(all_guesses))} unique."
             )
 
         res = []
@@ -134,12 +142,13 @@ class TwitterWordle():
     def solve(self,
               wordle_num=None,
               tweet_list=None,
-              plot=True,
+              plot=False,
               downsample=None,
               min_count=3,
               iterate_low_score=True,
               exclude_misses=False,
               return_full_plot=False,
+              mask_result=True,
               **kwargs):
         """Can extract a tweet from self.tweet_df or process a list of tweets"""
 
@@ -194,15 +203,42 @@ class TwitterWordle():
             prediction, sigma, data, delta_above_two = sorted(
                 iterated_results, key=lambda x: x[3])[-1]
 
-        print(
-            f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
-        )
+        if not mask_result:
+            print(
+                f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
+            )
+            fig = self.make_figure(return_full_plot, data)
+            return_val = prediction
+        else:
+            print(
+                f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
+            )
+            print(
+                f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
+            )
+            plot_data = data.sort_values().tail(20)
+            plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
+            fig = self.make_figure(return_full_plot, plot_data)
+            return_val = help_hash(prediction)
+        #print(f"Wordle {wordle_num} score: {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n")
         if plot:
-            if not return_full_plot:
-                return data.sort_values().tail(20).plot.bar()
-            return data.sort_values().plot.bar()
+            fig.show()
+        return return_val
 
     def solve_all(self, **kwargs):
         if self.tweet_df is not None:
             for wordle_num in sorted(self.tweet_df['wordle_id'].unique()):
                 self.solve(wordle_num, **kwargs)
+
+    def make_figure(self, make_full_plot, data):
+        if make_full_plot:
+            return data.sort_values().plot.bar(labels={
+                'index': 'Hashed Word',
+                'value': 'Normalized Score'
+            })
+        else:
+            return data.sort_values().tail(20).plot.bar(
+                labels={
+                    'index': 'Hashed Word',
+                    'value': 'Normalized Score'
+                })
