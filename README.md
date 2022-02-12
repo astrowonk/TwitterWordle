@@ -14,6 +14,8 @@ The `TwitterWordle` class here can predict the wordle of the day only from publi
 
 I can't decide if this is the coolest way to "solve" wordle or the dumbest. I do think it's a fun problem to try and extract a signal from what seems like noisy data.
 
+The code now, by default, runs in a mode where it doesn't reveal the answer, it should print a SHA256 hash of the answer and compare it to a hashed answer dictionary to verify if it's correct (assuming the NY Times doesn't change the deterministic pre-shuffled order.) Similarly the plot, by default, will has the words on the x-axis.
+
 Storing tweets is [complicated](https://developer.twitter.com/en/developer-terms/agreement-and-policy), so best to [download the data from kaggle](https://www.kaggle.com/benhamner/wordle-tweets), I'm not hosting any tweets in this repository. I have a helper function that uses [searchtweets](https://pypi.org/project/searchtweets-v2/) to download, if you have a Developer account and API keys.
 
 Major differences from above Kaggle notebook:
