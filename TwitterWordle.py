@@ -148,7 +148,7 @@ class TwitterWordle():
               iterate_low_score=True,
               exclude_misses=False,
               return_full_plot=False,
-              print_unmasked_answer=False,
+              mask_result=True,
               **kwargs):
         """Can extract a tweet from self.tweet_df or process a list of tweets"""
 
@@ -203,27 +203,34 @@ class TwitterWordle():
             prediction, sigma, data, delta_above_two = sorted(
                 iterated_results, key=lambda x: x[3])[-1]
 
-        if plot:
-            if not return_full_plot:
-                return data.sort_values().tail(20).plot.bar()
-            return data.sort_values().plot.bar(), prediction
-        if print_unmasked_answer:
+        if not mask_result:
             print(
                 f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
             )
-        print(
-            f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
-        )
-        print(
-            f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
-        )
-        plot_data = data.sort_values().tail(20)
-        plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
-        fig = plot_data.plot(kind='bar')
-        fig.show()
-        return help_hash(prediction)
+            fig = self.make_figure(return_full_plot, data)
+            return_val = prediction
+        else:
+            print(
+                f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
+            )
+            print(
+                f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
+            )
+            plot_data = data.sort_values().tail(20)
+            plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
+            fig = self.make_figure(return_full_plot, plot_data)
+            return_val = help_hash(prediction)
+        if plot:
+            fig.show()
+        return return_val
 
     def solve_all(self, **kwargs):
         if self.tweet_df is not None:
             for wordle_num in sorted(self.tweet_df['wordle_id'].unique()):
                 self.solve(wordle_num, **kwargs)
+
+    def make_figure(self, make_full_plot, data):
+        if make_full_plot:
+            return data.sort_values().plot.bar()
+        else:
+            return data.sort_values().tail(20).plot.bar()

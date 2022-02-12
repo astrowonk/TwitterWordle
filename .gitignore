@@ -12,3 +12,4 @@ recent_tweets.parquet
 !unigram_freq.csv
 !dontlook.txt
 !wordle-dictionary-full.txt
+wordle-tweets.zip
