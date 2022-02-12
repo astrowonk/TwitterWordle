@@ -77,7 +77,7 @@ class TwitterWordle():
         if not downsample:
             if verbose:
                 print(
-                    f"{len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for wordle {wordle_num}"
+                    f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}"
                 )
             return flatten_list([
                 x
@@ -122,7 +122,7 @@ class TwitterWordle():
             min_count = np.floor(np.quantile(list(c.values()), .25))
         if verbose:
             print(
-                f"{len(the_guesses)} guess scores. {len(set(all_guesses))} unique. Min count : {min_count}"
+                f"{len(the_guesses)} guess scores. {len(set(all_guesses))} unique."
             )
 
         res = []
@@ -220,6 +220,7 @@ class TwitterWordle():
             plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
             fig = self.make_figure(return_full_plot, plot_data)
             return_val = help_hash(prediction)
+        #print(f"Wordle {wordle_num} score: {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n")
         if plot:
             fig.show()
         return return_val
@@ -231,6 +232,13 @@ class TwitterWordle():
 
     def make_figure(self, make_full_plot, data):
         if make_full_plot:
-            return data.sort_values().plot.bar()
+            return data.sort_values().plot.bar(labels={
+                'index': 'Hashed Word',
+                'value': 'Normalized Score'
+            })
         else:
-            return data.sort_values().tail(20).plot.bar()
+            return data.sort_values().tail(20).plot.bar(
+                labels={
+                    'index': 'Hashed Word',
+                    'value': 'Normalized Score'
+                })
