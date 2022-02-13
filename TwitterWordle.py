@@ -17,7 +17,8 @@ def flatten_list(list_of_lists):
 
 
 def check_match(x):
-    if re.search(r"Wordle \d{3}", x):
+    if re.search(r"Wordle \d{3}", x) and len(
+            re.findall("wordle", x, re.IGNORECASE)) == 1 and ('https' not in x.lower()):
         return True
     return False
 
@@ -38,8 +39,13 @@ class TwitterWordle():
             assert isinstance(tweet_df, pd.DataFrame), 'Must be a dataframe'
         self.tweet_df = tweet_df
         if self.tweet_df is not None:
-            self.tweet_df = self.tweet_df.loc[tweet_df['tweet_text'].apply(
-                check_match)]
+            self.tweet_df = self.tweet_df.loc[
+                tweet_df.loc[:, 'tweet_text'].apply(check_match)]
+            self.tweet_df['score_list'] = self.tweet_df['tweet_text'].apply(
+                self.wordle_guesses)
+            self.tweet_df = self.tweet_df.loc[
+                self.tweet_df.loc[:,
+                                  'score_list'].apply(lambda x: len(x) <= 6)]
         with open("hashed_lookup.json", "r") as data_file:
             self.solution_dict = json.load(data_file)
 
@@ -80,19 +86,13 @@ class TwitterWordle():
                 print(
                     f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}"
                 )
-            return flatten_list([
-                x
-                for x in (self.tweet_df.query(f'wordle_id == {wordle_num}')
-                          ['tweet_text'].apply(self.wordle_guesses)).tolist()
-                if len(x) <= 6
-            ])
+            return flatten_list(
+                self.tweet_df.query(f'wordle_id == {wordle_num}')
+                ['score_list'].tolist())
 
-        return flatten_list([
-            x for x in (self.tweet_df.query(f'wordle_id == {wordle_num}')
-                        ['tweet_text'].apply(self.wordle_guesses)
-                        ).sample(downsample, random_state=42).tolist()
-            if len(x) <= 6
-        ])
+        return flatten_list(
+            self.tweet_df.query(f'wordle_id == {wordle_num}').sample(
+                downsample, random_seed=42)['score_list'].tolist())
 
     @staticmethod
     def wordle_guesses(tweet):
