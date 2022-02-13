@@ -30,6 +30,7 @@ class TwitterWordle():
         else:
             self.zipped_counters = pickle.load(
                 open("zipped_counters_allwords.pickle", "rb"))
+        self.zipped_counters = {key: val for key, val in self.zipped_counters}
         print(
             f"Loaded {len(self.zipped_counters)} pre-computed lookup dictionaries."
         )
@@ -126,7 +127,7 @@ class TwitterWordle():
             )
 
         res = []
-        for key, val in self.zipped_counters:
+        for key, val in self.zipped_counters.items():
             res.append({
                 'sum':
                 self.process_counter(val, c, min_count=min_count, **kwargs),
@@ -136,8 +137,8 @@ class TwitterWordle():
         res = pd.DataFrame(res).set_index('word').sort_values('sum')['sum']
         # print(res.describe())
         res = (res / res.mean()) - 1
-        return res.index[-1], res.max() / res.std(), res, (res.iloc[-1] /
-                                                           res.iloc[-2])
+        return res.index[-1], res.max() / res.std(), res, (
+            res.iloc[-1] / res.iloc[-2]), the_guesses
 
     def solve(self,
               wordle_num=None,
@@ -165,7 +166,7 @@ class TwitterWordle():
                 for x in [x for x in tweet_list if check_match(x)]
             ])
 
-        prediction, sigma, data, delta_above_two = self.solve_guess_list(
+        prediction, sigma, data, delta_above_two, the_guesses = self.solve_guess_list(
             score_guess_list,
             min_count=min_count,
             exclude_misses=exclude_misses,
@@ -187,7 +188,7 @@ class TwitterWordle():
                     penalty_term = p * 1E7
                     if delta_above_two > 1.1:
                         continue
-                    prediction, sigma, data, delta_above_two = self.solve_guess_list(
+                    prediction, sigma, data, delta_above_two, the_guesses = self.solve_guess_list(
                         score_guess_list,
                         min_count=my_min_count,
                         penalty_term=penalty_term,
@@ -202,6 +203,10 @@ class TwitterWordle():
         if delta_above_two < 1.1 and iterate_low_score:
             prediction, sigma, data, delta_above_two = sorted(
                 iterated_results, key=lambda x: x[3])[-1]
+        prediction_dict = self.zipped_counters.get(prediction)
+        print(
+            f"{len(set(the_guesses)) / len(prediction_dict):.2%} of all possible final guess scores found. {len(set(the_guesses).difference(set(prediction_dict.keys())))} impossible scores found."
+        )
 
         if not mask_result:
             print(
