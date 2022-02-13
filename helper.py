@@ -86,11 +86,15 @@ def get_num_line(guess, answer):
         x for i, x in enumerate(answer) if match_and_position[i] != 2
     ]
 
+    # print('remaining letters', remaining_letters)
+
     def find_non_position_match(remaining_letters, guess):
         """has to be a better way"""
         res = []
-        for letter in guess:
-            if letter in remaining_letters:
+        for i, letter in enumerate(guess):
+            # print(letter)
+            # print(letter in remaining_letters)
+            if letter in remaining_letters and match_and_position[i] != 2:
                 res.append(1)
                 remaining_letters.remove(letter)
             else:
