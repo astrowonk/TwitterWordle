@@ -13,3 +13,4 @@ recent_tweets.parquet
 !dontlook.txt
 !wordle-dictionary-full.txt
 wordle-tweets.zip
+config.py

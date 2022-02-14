@@ -18,7 +18,8 @@ def flatten_list(list_of_lists):
 
 def check_match(x):
     if re.search(r"Wordle \d{3}", x) and len(
-            re.findall("wordle", x, re.IGNORECASE)) == 1 and ('https' not in x.lower()):
+            re.findall("wordle", x,
+                       re.IGNORECASE)) == 1 and ('https' not in x.lower()):
         return True
     return False
 
@@ -92,7 +93,7 @@ class TwitterWordle():
 
         return flatten_list(
             self.tweet_df.query(f'wordle_id == {wordle_num}').sample(
-                downsample, random_seed=42)['score_list'].tolist())
+                downsample, random_state=42)['score_list'].tolist())
 
     @staticmethod
     def wordle_guesses(tweet):
@@ -123,7 +124,7 @@ class TwitterWordle():
             min_count = np.floor(np.quantile(list(c.values()), .25))
         if verbose:
             print(
-                f"{len(the_guesses)} guess scores. {len(set(all_guesses))} unique."
+                f"{len(the_guesses)} score patterns. {len(set(the_guesses))} unique."
             )
 
         res = []
@@ -204,8 +205,12 @@ class TwitterWordle():
             prediction, sigma, data, delta_above_two = sorted(
                 iterated_results, key=lambda x: x[3])[-1]
         prediction_dict = self.zipped_counters.get(prediction)
+        numerator = len(set(the_guesses))
+        denom = len(prediction_dict)
+        impossible_count = len(
+            set(the_guesses).difference(set(prediction_dict.keys())))
         print(
-            f"{len(set(the_guesses)) / len(prediction_dict):.2%} of all possible final guess scores found. {len(set(the_guesses).difference(set(prediction_dict.keys())))} impossible scores found."
+            f"{(numerator-impossible_count) / denom:.2%}, ({numerator-impossible_count}/{denom}) valid final guess patterns found. Impossible pattern count: {impossible_count}"
         )
 
         if not mask_result:
