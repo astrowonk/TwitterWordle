@@ -33,7 +33,7 @@ class TwitterWordle():
                 open("zipped_counters2.pickle", "rb"))
         else:
             self.zipped_counters = pickle.load(
-                open("zipped_counters_allwords.pickle", "rb"))
+                open("zipped_counters_allwords_nyt.pickle", "rb"))
         self.output = []
         self.zipped_counters = {key: val for key, val in self.zipped_counters}
         self.print_store(
