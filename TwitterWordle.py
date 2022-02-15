@@ -53,9 +53,9 @@ class TwitterWordle():
         with open("hashed_lookup.json", "r") as data_file:
             self.solution_dict = json.load(data_file)
 
-    def print_store(self, s,**kwargs):
+    def print_store(self, s, **kwargs):
         self.output.append(s)
-        print(s,**kwargs)
+        print(s, **kwargs)
 
     @staticmethod
     def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=3):
@@ -260,3 +260,19 @@ class TwitterWordle():
                     'index': 'Hashed Word',
                     'value': 'Normalized Score'
                 })
+
+    def show_bad_tweets(self, answer, wordle_num):
+        all_guesses = self.extract_all_guesses(wordle_num)
+
+        bad_guesses = set(all_guesses).difference(
+            set(self.zipped_counters[answer].keys()))
+
+        thelocs = self.tweet_df['score_list'].apply(
+            lambda x: any(y in x for y in bad_guesses))
+
+        print(bad_guesses)
+
+        for x in (self.tweet_df.loc[thelocs].query('wordle_id == @wordle_num')
+                  ['tweet_text']):
+            print('------')
+            print(x)
