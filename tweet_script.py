@@ -1,5 +1,5 @@
 import argparse
-from config import *
+import config
 import tweepy
 import json
 from TwitterWordle import TwitterWordle
@@ -22,9 +22,6 @@ if __name__ == '__main__':
 
     t = TwitterWordle(df, use_limited_targets=False)
 
-    api = tweepy.Client(consumer_key=api_key,
-                        consumer_secret=api_secret,
-                        access_token=access_token,
-                        access_token_secret=access_token_secret)
-
-    ## need to make code to check date and tweet log reply to yesterday as well as upload the log?
+    auth = tweepy.OAuthHandler(config.api_key, config.api_secret)
+    auth.set_access_token(config.access_token, config.access_token_secret)
+    api = tweepy.API(auth)
