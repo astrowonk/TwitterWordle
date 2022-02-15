@@ -25,6 +25,8 @@ def check_match(x):
 
 
 class TwitterWordle():
+    last_figure = None
+
     def __init__(self, tweet_df=None, use_limited_targets=True):
         if use_limited_targets:
             self.zipped_counters = pickle.load(
@@ -32,8 +34,9 @@ class TwitterWordle():
         else:
             self.zipped_counters = pickle.load(
                 open("zipped_counters_allwords.pickle", "rb"))
+        self.output = []
         self.zipped_counters = {key: val for key, val in self.zipped_counters}
-        print(
+        self.print_store(
             f"Loaded {len(self.zipped_counters)} pre-computed lookup dictionaries."
         )
         if tweet_df is not None:
@@ -49,6 +52,10 @@ class TwitterWordle():
                                   'score_list'].apply(lambda x: len(x) <= 6)]
         with open("hashed_lookup.json", "r") as data_file:
             self.solution_dict = json.load(data_file)
+
+    def print_store(self, s,**kwargs):
+        self.output.append(s)
+        print(s,**kwargs)
 
     @staticmethod
     def process_counter(target_dictionary, c, penalty_term=-5E7, min_count=3):
@@ -84,7 +91,7 @@ class TwitterWordle():
         """for the dataframe, extract the guesses for wordle_num into a single list"""
         if not downsample:
             if verbose:
-                print(
+                self.print_store(
                     f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}"
                 )
             return flatten_list(
@@ -114,7 +121,7 @@ class TwitterWordle():
         if not exclude_misses:
             the_guesses = [x for x in all_guesses if x != '22222']
         else:
-            print("Excluding misses")
+            self.print_store("Excluding misses")
             the_guesses = [
                 x for x in all_guesses if x not in ('22222', '00000')
             ]
@@ -123,7 +130,7 @@ class TwitterWordle():
         if not min_count:
             min_count = np.floor(np.quantile(list(c.values()), .25))
         if verbose:
-            print(
+            self.print_store(
                 f"{len(the_guesses)} score patterns. {len(set(the_guesses))} unique."
             )
 
@@ -136,7 +143,7 @@ class TwitterWordle():
                 key
             })
         res = pd.DataFrame(res).set_index('word').sort_values('sum')['sum']
-        # print(res.describe())
+        # self.print_store(res.describe())
         res = (res / res.mean()) - 1
         return res.index[-1], res.max() / res.std(), res, (
             res.iloc[-1] / res.iloc[-2]), the_guesses
@@ -155,13 +162,13 @@ class TwitterWordle():
         """Can extract a tweet from self.tweet_df or process a list of tweets"""
 
         assert wordle_num or tweet_list, "Must provide either a wordle_num or a list of tweets"
-
+        self.output = []
         if wordle_num:
             assert self.tweet_df is not None, "Class must be instantiated with a dataframe to solve from a wordle number"
             score_guess_list = self.extract_all_guesses(wordle_num,
                                                         downsample=downsample)
         elif tweet_list:
-            print(f"{len(tweet_list)} tweets")
+            self.print_store(f"{len(tweet_list)} tweets")
             score_guess_list = flatten_list([
                 self.wordle_guesses(x)
                 for x in [x for x in tweet_list if check_match(x)]
@@ -174,7 +181,7 @@ class TwitterWordle():
             **kwargs)
         iterated_results = []
         if delta_above_two < 1.1 and iterate_low_score:
-            print(
+            self.print_store(
                 f'Wordle {wordle_num} initial signal low {delta_above_two:1.3}. Iterating for better parameters'
             )
 
@@ -184,7 +191,7 @@ class TwitterWordle():
                     continue
 
                 for p in range(-7, -100, -2):
-                    print(".", end="")
+                    self.print_store(".", end="")
 
                     penalty_term = p * 1E7
                     if delta_above_two > 1.1:
@@ -198,7 +205,7 @@ class TwitterWordle():
                     final_penalty_term = penalty_term
                     iterated_results.append(
                         (prediction, sigma, data, delta_above_two))
-            print(
+            self.print_store(
                 f"\nIterated to a better signal with min_count {final_min_count} and penalty {final_penalty_term:.2E}"
             )
         if delta_above_two < 1.1 and iterate_low_score:
@@ -209,30 +216,31 @@ class TwitterWordle():
         denom = len(prediction_dict)
         impossible_count = len(
             set(the_guesses).difference(set(prediction_dict.keys())))
-        print(
+        self.print_store(
             f"{(numerator-impossible_count) / denom:.2%}, ({numerator-impossible_count}/{denom}) valid final guess patterns found. Impossible pattern count: {impossible_count}"
         )
 
         if not mask_result:
-            print(
+            self.print_store(
                 f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
             )
             fig = self.make_figure(return_full_plot, data)
             return_val = prediction
         else:
-            print(
+            self.print_store(
                 f'Wordle {wordle_num} solution hash: {help_hash(prediction)}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n'
             )
-            print(
+            self.print_store(
                 f"Solution match is {str(help_hash(prediction) == self.solution_dict[str(wordle_num)]).upper()}"
             )
             plot_data = data.sort_values().tail(20)
             plot_data.index = [help_hash(x)[:7] for x in plot_data.index]
             fig = self.make_figure(return_full_plot, plot_data)
             return_val = help_hash(prediction)
-        #print(f"Wordle {wordle_num} score: {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n")
+        #self.print_store(f"Wordle {wordle_num} score: {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n")
         if plot:
             fig.show()
+        self.last_figure = fig
         return return_val
 
     def solve_all(self, **kwargs):
