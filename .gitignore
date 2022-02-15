@@ -14,3 +14,4 @@ recent_tweets.parquet
 !wordle-dictionary-full.txt
 wordle-tweets.zip
 config.py
+!wordle-all_2022-02-15.txt
