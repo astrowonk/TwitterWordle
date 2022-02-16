@@ -36,7 +36,7 @@ class TwitterWordle():
                 open("zipped_counters_allwords_nyt.pickle", "rb"))
         self.output = []
         self.zipped_counters = {key: val for key, val in self.zipped_counters}
-        self.print_store(
+        print(
             f"Loaded {len(self.zipped_counters)} pre-computed lookup dictionaries."
         )
         if tweet_df is not None:
@@ -92,7 +92,7 @@ class TwitterWordle():
         if not downsample:
             if verbose:
                 self.print_store(
-                    f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}"
+                    f"TwitterWordle analyzed {len(self.tweet_df.query(f'wordle_id == {wordle_num}'))} tweets for Wordle {wordle_num}.\n"
                 )
             return flatten_list(
                 self.tweet_df.query(f'wordle_id == {wordle_num}')
@@ -131,7 +131,7 @@ class TwitterWordle():
             min_count = np.floor(np.quantile(list(c.values()), .25))
         if verbose:
             self.print_store(
-                f"{len(the_guesses)} score patterns. {len(set(the_guesses))} unique."
+                f"{len(the_guesses)} score patterns. {len(set(the_guesses))} unique.\n"
             )
 
         res = []
@@ -217,12 +217,14 @@ class TwitterWordle():
         impossible_count = len(
             set(the_guesses).difference(set(prediction_dict.keys())))
         self.print_store(
-            f"{(numerator-impossible_count) / denom:.2%}, ({numerator-impossible_count}/{denom}) valid final guess patterns found. Impossible pattern count: {impossible_count}"
+            f"{(numerator-impossible_count) / denom:.2%}, ({numerator-impossible_count}/{denom}) valid final guess patterns found. Impossible pattern count: {impossible_count}.\n"
         )
 
         if not mask_result:
             self.print_store(
-                f"Wordle {wordle_num} prediction: {prediction.upper()}. {sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
+                f"Wordle {wordle_num} prediction: {prediction.upper()}.")
+            self.print_store(
+                f"{sigma:.2} STD above mean. {delta_above_two:.3} above runner up.\n"
             )
             fig = self.make_figure(return_full_plot, data)
             return_val = prediction
