@@ -50,7 +50,7 @@ class TwitterWordle():
             self.tweet_df = self.tweet_df.loc[
                 self.tweet_df.loc[:,
                                   'score_list'].apply(lambda x: len(x) <= 6)]
-        with open("hashed_lookup.json", "r") as data_file:
+        with open("hashed_lookup2.json", "r") as data_file:
             self.solution_dict = json.load(data_file)
 
     def print_store(self, s, **kwargs):
