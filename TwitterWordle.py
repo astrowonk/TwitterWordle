@@ -205,7 +205,7 @@ class TwitterWordle():
                     final_penalty_term = penalty_term
                     iterated_results.append(
                         (prediction, sigma, data, delta_above_two))
-            self.print_store(
+            print(
                 f"\nIterated to a better signal with min_count {final_min_count} and penalty {final_penalty_term:.2E}"
             )
         if delta_above_two < 1.1 and iterate_low_score:
