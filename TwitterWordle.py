@@ -181,7 +181,7 @@ class TwitterWordle():
             **kwargs)
         iterated_results = []
         if delta_above_two < 1.1 and iterate_low_score:
-            self.print_store(
+            print(
                 f'Wordle {wordle_num} initial signal low {delta_above_two:1.3}. Iterating for better parameters'
             )
 
