@@ -191,7 +191,7 @@ class TwitterWordle():
                     continue
 
                 for p in range(-7, -100, -2):
-                    self.print_store(".", end="")
+                    print(".", end="")
 
                     penalty_term = p * 1E7
                     if delta_above_two > 1.1:
