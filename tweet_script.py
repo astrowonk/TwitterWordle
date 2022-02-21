@@ -23,7 +23,7 @@ if __name__ == '__main__':
         df = get_tweets(args.wordle_num, return_df=True)
 
     t = TwitterWordle(df, use_limited_targets=True)
-    prediction = t.solve(args.wordle_num, mask_result=False, min_count=5)
+    prediction = t.solve(args.wordle_num, mask_result=False, min_count=4)
     if prediction == args.solution:
         emoji = '✅'
     else:
