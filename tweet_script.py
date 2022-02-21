@@ -6,6 +6,16 @@ from TwitterWordle import TwitterWordle
 import pandas as pd
 from get_tweets import get_tweets
 import io
+import datetime
+
+
+def today_wordle_num():
+
+    wordle_start = datetime.datetime(2021, 6, 19)
+    now = datetime.datetime.now()
+
+    return (now - wordle_start).days
+
 
 if __name__ == '__main__':
     pd.options.plotting.backend = "plotly"
@@ -43,7 +53,8 @@ if __name__ == '__main__':
     tweet_text = '\n'.join([add_emoji(x) for x in t.output])
     print(tweet_text)
     if not args.no_tweet:
-
+        assert args.wordle_num != today_wordle_num(
+        ), "Can't tweet today's wordle"
         try:
             with open('better_history.json') as f:
                 history = json.load(f)
