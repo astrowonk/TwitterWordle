@@ -29,8 +29,8 @@ class TwitterWordle():
 
     def __init__(self, tweet_df=None, use_limited_targets=True):
         if use_limited_targets:
-            self.zipped_counters = pickle.load(
-                open("zipped_counters2.pickle", "rb"))
+            self.zipped_counters = json.load(
+                open("zipped_counters_nyt_2022_02_15.json", "r"))
         else:
             self.zipped_counters = pickle.load(
                 open("zipped_counters_allwords_nyt.pickle", "rb"))

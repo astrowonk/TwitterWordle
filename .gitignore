@@ -17,3 +17,4 @@ config.py
 !wordle-all_2022-02-15.txt
 better_history.json
 target_index.py
+!wordle-targets_2022-02-15.txt
