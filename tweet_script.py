@@ -20,8 +20,9 @@ def today_wordle_num():
 if __name__ == '__main__':
     pd.options.plotting.backend = "plotly"
     parser = argparse.ArgumentParser(description='Wordle')
-    parser.add_argument('wordle_num', type=int, help='number of wordle')
     parser.add_argument('solution', type=str, help='wordle solution')
+
+    parser.add_argument('wordle_num', type=int, help='number of wordle')
     parser.add_argument('--no-tweet',
                         action='store_true',
                         help='no tweet',
@@ -31,6 +32,7 @@ if __name__ == '__main__':
         df = pd.read_parquet(f"wordle{args.wordle_num}.parquet")
     except FileNotFoundError:
         df = get_tweets(args.wordle_num, return_df=True)
+        df.to_parquet(f"wordle{args.wordle_num}.parquet")
 
     t = TwitterWordle(df, use_limited_targets=True)
     prediction = t.solve(args.wordle_num, mask_result=False, min_count=4)

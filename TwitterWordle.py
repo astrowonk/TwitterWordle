@@ -278,3 +278,16 @@ class TwitterWordle():
                   ['tweet_text']):
             print('------')
             print(x)
+
+    def make_bad_df(self, answer, wordle_num):
+        all_guesses = self.extract_all_guesses(wordle_num)
+
+        bad_guesses = set(all_guesses).difference(
+            set(self.zipped_counters[answer].keys()))
+
+        thelocs = self.tweet_df['score_list'].apply(
+            lambda x: any(y in x for y in bad_guesses))
+
+        print(bad_guesses)
+
+        return self.tweet_df.loc[thelocs].query('wordle_id == @wordle_num')
