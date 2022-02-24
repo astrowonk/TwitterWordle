@@ -27,6 +27,11 @@ if __name__ == '__main__':
                         action='store_true',
                         help='no tweet',
                         default=False)
+
+    parser.add_argument('--use-full-dictionary',
+                        action='store_true',
+                        help='use the full 12k word dictionary',
+                        default=False)
     args = parser.parse_args()
     try:
         df = pd.read_parquet(f"wordle{args.wordle_num}.parquet")
@@ -34,7 +39,7 @@ if __name__ == '__main__':
         df = get_tweets(args.wordle_num, return_df=True)
         df.to_parquet(f"wordle{args.wordle_num}.parquet")
 
-    t = TwitterWordle(df, use_limited_targets=True)
+    t = TwitterWordle(df, use_limited_targets=not args.use_full_dictionary)
     prediction = t.solve(args.wordle_num, mask_result=False, min_count=4)
     if prediction == args.solution:
         emoji = '✅'
