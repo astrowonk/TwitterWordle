@@ -122,3 +122,18 @@ def helper_func(target_word, freqs):
         'target': target_word,
         'guess': x
     } for x in short_words], freqs)
+
+
+def flatten_columns(self):
+    """Monkey patchable function onto pandas dataframes to flatten multiindex column names from tuples. Especially useful
+    with plotly.
+    pd.DataFrame.flatten_columns = flatten_columns
+    """
+    df = self.copy()
+    df.columns = [
+        '_'.join([str(x)
+                  for x in [y for y in item
+                            if y]]) if not isinstance(item, str) else item
+        for item in df.columns
+    ]
+    return df

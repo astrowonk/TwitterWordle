@@ -1,13 +1,22 @@
 import pandas as pd
 from TwitterWordle import TwitterWordle, check_match
-from helper import get_num_line, stringify
+from helper import get_num_line, stringify, make_freqs
+import zipfile
+
 import json
+import config
+
+image_mapping_dict = {1: "🟨", 0: "⬜", 2: "🟩"}
+
+
+def map_to_emoji(pattern):
+    return ''.join([image_mapping_dict[int(x)] for x in pattern])
+
 
 wordle_lookup = {
     i: x
     for i, x in enumerate(
-        pd.read_csv("../wordle_public/all_wordles.txt", header=None)
-        [0].tolist())
+        pd.read_csv(config.wordle_solution_file_path, header=None)[0].tolist())
 }
 
 pattern_lookup_dict = {
@@ -50,17 +59,35 @@ def get_first_words(df):
     df = df.query('valid == True')
     print(f"Filtered out {pre_filter_ln - len(df)} of {pre_filter_ln} rows")
     for answer, _df in df.groupby('answer'):
-        count_lookup = _df['first_score'].value_counts().rank(
+        rank_lookup = _df['first_score'].value_counts().rank(
             ascending=False).to_dict()
+        count_fraction_lookup = (
+            _df['first_score'].value_counts() /
+            _df['first_score'].value_counts().sum()).to_dict()
         temp_df = pd.DataFrame([{
             'score': stringify(get_num_line(x, answer)),
             'target': answer,
             'guess': x
         } for x in short_words])
-        temp_df['score_frequency_rank'] = temp_df['score'].map(count_lookup)
+        temp_df['score_frequency_rank'] = temp_df['score'].map(rank_lookup)
+        temp_df['score_count_fraction'] = temp_df['score'].map(
+            count_fraction_lookup)
+
         out.append(temp_df)
     df_concat = pd.concat(out)
     df_concat['wordle_num'] = df_concat['target'].map(reverse_map)
     df_concat['guess_count'] = df_concat.groupby(
         ['target', 'score'])['guess'].transform('count')
     return df_concat
+
+
+def make_first_guest_list():
+    with zipfile.ZipFile('wordle-tweets.zip') as myzip:
+        tweets = pd.read_csv(myzip.open('tweets.csv'))
+    first_guess_list = get_first_words(tweets)
+    freq_map = make_freqs()
+
+    first_guess_list['commonality'] = first_guess_list['guess'].map(freq_map)
+    first_guess_list['weighted_rank'] = (
+        first_guess_list['score_frequency_rank']**2)
+    return first_guess_list

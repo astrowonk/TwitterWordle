@@ -18,3 +18,5 @@ config.py
 better_history.json
 target_index.py
 !wordle-targets_2022-02-15.txt
+wordle_first_words.db
+!Top Wordle Openers.ipynb
