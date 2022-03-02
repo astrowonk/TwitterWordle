@@ -1,5 +1,7 @@
 # Wordle inferred from Twitter shared results.
 
+(See also, [Most Popular Wordle Openers Analysis](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb))
+
 ### The Notebooks: 
 
 More details in the Jupyter Notetbooks:
