@@ -84,6 +84,7 @@ def get_first_words(df):
 def make_first_guest_list():
     with zipfile.ZipFile('wordle-tweets.zip') as myzip:
         tweets = pd.read_csv(myzip.open('tweets.csv'))
+    print(f"Max wordle num {tweets['wordle_id'].max()}")
     first_guess_list = get_first_words(tweets)
     freq_map = make_freqs()
 
