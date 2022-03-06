@@ -16,8 +16,9 @@ def flatten_list(list_of_lists):
     return [y for x in list_of_lists for y in x]
 
 
-def check_match(x):
-    if re.search(r"Wordle \d{3}", x) and len(
+def check_match(y):
+    x, wordle_num = y
+    if re.search(f"Wordle {wordle_num}", x) and len(
             re.findall("wordle", x,
                        re.IGNORECASE)) == 1 and ('https' not in x.lower()):
         return True
@@ -44,7 +45,8 @@ class TwitterWordle():
         self.tweet_df = tweet_df
         if self.tweet_df is not None:
             self.tweet_df = self.tweet_df.loc[
-                tweet_df.loc[:, 'tweet_text'].apply(check_match)]
+                tweet_df.loc[:,
+                             ['tweet_text', 'wordle_id']].apply(check_match,axis=1)]
             self.tweet_df['score_list'] = self.tweet_df['tweet_text'].apply(
                 self.wordle_guesses)
             self.tweet_df = self.tweet_df.loc[
