@@ -53,7 +53,8 @@ def get_first_words(df):
                                axis=1)
     out = []
     pre_filter_ln = len(df)
-    df = df.loc[df.loc[:, 'tweet_text'].apply(check_match)]
+    df = df.loc[df.loc[:, ['tweet_text', 'wordle_id']].apply(check_match,
+                                                             axis=1)]
     df = df.loc[df.loc[:, 'score_list'].apply(lambda x: len(x) <= 6)]
 
     df = df.query('valid == True')
