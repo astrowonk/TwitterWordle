@@ -13,16 +13,24 @@ def map_to_emoji(pattern):
     return ''.join([image_mapping_dict[int(x)] for x in pattern])
 
 
-wordle_lookup = {
-    i: x
-    for i, x in enumerate(
-        pd.read_csv(config.wordle_solution_file_path, header=None)[0].tolist())
-}
-
 pattern_lookup_dict = {
     key: val
     for key, val in json.load(open("zipped_counters_nyt_2022_02_15.json", "r"))
 }
+
+
+def better_wordle_solutions():
+    wordle_lookup = {
+        i: x
+        for i, x in enumerate(
+            pd.read_csv(config.wordle_solution_file_path, header=None)
+            [0].tolist())
+    }
+    new_dict = pd.read_json("../wordle_public/better_history.json").set_index(
+        'wordle_num')['word'].to_dict()
+    wordle_lookup.update(new_dict)
+    wordle_lookup.update({335: 'gamer'})
+    return wordle_lookup
 
 
 def try_fail(x):
@@ -41,13 +49,13 @@ def flag_possible_only(score_pattern_list, answer):
 
 
 def get_first_words(df):
-    reverse_map = {val: key for key, val in wordle_lookup.items()}
+    reverse_map = {val: key for key, val in better_wordle_solutions().items()}
 
     df['score_list'] = df['tweet_text'].apply(TwitterWordle.wordle_guesses)
     short_words = pd.read_csv('wordle-all_2022-02-15.txt', header=None)[0]
     df['first_score'] = df['tweet_text'].apply(try_fail)
 
-    df['answer'] = df['wordle_id'].map(wordle_lookup)
+    df['answer'] = df['wordle_id'].map(better_wordle_solutions())
     df['valid'] = df[['score_list', 'answer'
                       ]].apply(lambda x: flag_possible_only(x[0], x[1]),
                                axis=1)
