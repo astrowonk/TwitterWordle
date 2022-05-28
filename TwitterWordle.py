@@ -45,8 +45,8 @@ class TwitterWordle():
         self.tweet_df = tweet_df
         if self.tweet_df is not None:
             self.tweet_df = self.tweet_df.loc[
-                tweet_df.loc[:,
-                             ['tweet_text', 'wordle_id']].apply(check_match,axis=1)]
+                tweet_df.loc[:, ['tweet_text', 'wordle_id']].apply(check_match,
+                                                                   axis=1)]
             self.tweet_df['score_list'] = self.tweet_df['tweet_text'].apply(
                 self.wordle_guesses)
             self.tweet_df = self.tweet_df.loc[
@@ -182,21 +182,21 @@ class TwitterWordle():
             exclude_misses=exclude_misses,
             **kwargs)
         iterated_results = []
-        if delta_above_two < 1.1 and iterate_low_score:
+        if delta_above_two < 1.13 and iterate_low_score:
             print(
                 f'Wordle {wordle_num} initial signal low {delta_above_two:1.3}. Iterating for better parameters'
             )
 
             for my_min_count in range(max(min_count - 2, 1), min_count + 10,
                                       2):
-                if delta_above_two > 1.1:
+                if delta_above_two > 1.13:
                     continue
 
                 for p in range(-7, -100, -2):
                     print(".", end="")
 
                     penalty_term = p * 1E7
-                    if delta_above_two > 1.1:
+                    if delta_above_two > 1.13:
                         continue
                     prediction, sigma, data, delta_above_two, the_guesses = self.solve_guess_list(
                         score_guess_list,
