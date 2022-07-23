@@ -20,3 +20,7 @@ target_index.py
 !wordle-targets_2022-02-15.txt
 wordle_first_words.db
 !Top Wordle Openers.ipynb
+openers_files/*
+openers_files
+index.html
+.jupyter_cache/

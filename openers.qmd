@@ -1,0 +1,248 @@
+---
+title: "Most Popular Wordle Openers"
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-location: left
+    output-file: index.html
+jupyter: python3
+execute:
+  freeze: auto 
+  cache: true
+---
+
+### Introduction
+
+Wordle tweet data is a useful data source and can, for example, [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
+
+
+Analyzing the popularity of wordle openers is a little harder, since on any given day all we know are the most popular opening patterns.) I used a Ridge linear regression to look for popular openers across multiple wordles.
+
+TDLR; the most common openers are below, though bear in mind even the top choice `adieu` is estimated to be only 1.2-5% of all openers. 
+
+1. adieu
+2. audio 
+3. stare
+4. irate
+5. crane
+6. raise
+7. arise
+8. great
+9. heart
+10. train
+11. tears
+12. arose
+13. steam
+14. soare
+15. share ^[Possible false positive from _soare_]
+
+
+
+
+### Load and prep the data
+Most of the functionality used is in the files `first_word.py`. The function `make_first_guess_list` creates a useful dataframe for analysis.
+
+I start with the excellent kaggle data set [wordle-tweets](https://www.kaggle.com/benhamner/wordle-tweets) and extract directly from the zipfile which I download with the [kaggle api](https://github.com/Kaggle/kaggle-api). The `get_first_words` function processes the dataframe:
+
+1. It removes tweeted scores that contain an invalid score line for that answer (likely played on a cached version of the puzzle, not the live one on the NY Times site).
+2. It removes any tweets that have more than 6 score patterns.
+3. It extracts the first pattern from the tweeted scores.
+4. It maps on the answer for a given wordle id.
+5. It groups by the answer for the day, and creates a dataframe that has score, target, guess, and some data on how popular that score is.
+
+```{python}
+from first_word import make_first_guest_list
+import pandas as pd
+df = make_first_guest_list()
+df
+```
+
+### Simple analysis
+
+We have a large dataframe of almost 600,000 columns. One row for every pattern and every guess for every wordle answer. A simple way to look at common starter words would be to group by the guess and look which words consistently rank high across several days.
+
+```{python}
+df.groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
+```
+
+This analysis leaves a lot to be desired. While other evidence indicates `adieu` is a popular opener, it does not seem like `jazzy` would be one. Or for that matter, words with a `z`. 
+
+The `00000` all grey pattern is fairly common, so words with uncommon letters will show up a lot since `00000` is common because of the sheer volume of words that can create the pattern. So what happens if we  filter out the null score? Not much...
+
+```{python}
+df.query("score != '00000'").groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
+```
+
+So are people guessing `braze` first regularly or is something else going on? BRAZE's score line is common but what other words could make the same patern? 
+
+```{python}
+df.query('score == "00101" and wordle_num == 230').sort_values('commonality',ascending=False).head(10)
+```
+
+There are a lot of words that make the same pattern, is `BRAZE` popular or is it riding the coattails of some other `_RA_E` word?
+
+### Linear Regression
+
+A better approach is to control for the presence of other words. If BRAZE only does well when it's paired with GRACE or GRADE or SHARE than a linear regression should isolate the guesses that actually are predictive of a popular score count line. But, there will be a lot of colinearity so we will use a Ridge regression.
+
+The difficulty comes from getting the dataframe into the right format, thankfully I discovered [pd.crosstab](https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html), and there are [other methods that were all better](https://stackoverflow.com/questions/46791626/one-hot-encoding-multi-level-column-data) than what I had been doing originally (an awful groupby loop than took over a minute.)
+
+I normalize the data a little and then fit a model. I will use a [Ridge](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification) which helps control the size of the coefficients, and is neccessary to handle the colinearity of the variables.
+
+```{python}
+df.rename(columns={'score': 'score_pattern'}, inplace=True)
+
+one_hot_encoded_data = pd.crosstab(
+    [df['wordle_num'], df['score_pattern']], df['guess']).join(
+        df.groupby(['wordle_num',
+                    'score_pattern'])[['score_count_fraction',
+                                       'guess_count']].first()).reset_index()
+
+one_hot_encoded_data.dropna(subset=['score_count_fraction'],inplace=True) #don't need patterns no one actually guessed
+# actually not sure if fillna 0 would be better?
+std = one_hot_encoded_data['score_count_fraction'].std()
+
+guess_count_std = one_hot_encoded_data[
+    'guess_count'].std()
+guess_count_mean = one_hot_encoded_data['guess_count'].mean()
+
+one_hot_encoded_data['guess_count'] = (one_hot_encoded_data[
+    'guess_count'] - guess_count_mean ) / guess_count_std
+
+```
+
+Fitting the Ridge model...
+
+
+```{python}
+from sklearn import linear_model
+data = one_hot_encoded_data.query("wordle_num != 258") #explained further down, this data point has particularly bad colinearity issues
+X= data.drop(
+        columns=[ 'score_count_fraction', 'wordle_num','score_pattern']) # fit to the one hot encoded guesses and the total guess count
+y=data['score_count_fraction'] # our dependent is the fraction of guesses that had the score pattern
+
+r = linear_model.RidgeCV(alphas=[10,15])
+r.fit(X,y)
+r.alpha_
+```
+
+#### Results!
+
+Now we can just look at the coefficients of the variables to see which ones most strongly predict a popular pattern. The top few guesses contain [some](https://yougov.co.uk/topics/entertainment/articles-reports/2022/02/03/wordle-starter-words-hard-mode-and-x6-how-are-brit) [familiar](https://today.yougov.com/topics/lifestyle/articles-reports/2022/02/18/wordle-willingness-to-pay-poll) choices. 
+
+```{python}
+top_openers = pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
+         columns=['coef', 'variable']).sort_values('coef',ascending=False)
+top_openers.head(15)
+```
+
+Wordle 258 (solution `ahead`) is creating an issue with `adieu` - only 4 other words create the same pattern and they are riding the coattails of adieu and creeping into the top lists. The guess count is only 5, so this looks like a strong signal but it's driven by adieu, rather than the popularity of `advew`. I decided the simplest thing is to remove the 258 data point. Otherwise, all 4 of the other words show up in the top 15.
+
+```{python}
+df.query('wordle_num == 258 and score_pattern == "21010"')
+```
+
+```{python}
+for i, var in enumerate(top_openers.query('variable != "guess_count"')['variable'].head(15)):
+    print(f"{i+1}. {var}")
+```
+
+#### Just how popular is _adieu_?
+
+Ok, so _adieu_ is popular but exactly how many people are actually using it every day? To answer this, I looked at what fraction of all tweeted score patterns are consistent with `adieu` and plot that against how many other words could have also made that pattern.
+
+```{python}
+guess = 'adieu'
+df.query(f'guess == @guess and guess_count < 400').sort_values(
+    'wordle_num').plot.scatter(
+        x='guess_count',
+        y='score_count_fraction',
+        hover_data=['score_pattern', 'wordle_num'],
+        # color='guess_count',
+        title=f'{guess.upper()} popularity',
+        backend='plotly',
+        # color_continuous_scale='bluered',
+    )
+```
+
+So in the real data, the minimum fraction that was `adieu` was about 4%.
+
+One could try and extrapolate the points and fit a line to this to see what it would like at a guess_count of 1 from the above data, but of course, we already fit a model to the data. The fitted Ridge model can predict what `adieu` (and all the other top choices) would do with a guess count of 1 and where `adieu` was the only word that could make it:
+
+
+```{python}
+
+series_list = []
+for word in top_openers['variable'].head(15):
+    predict_dict = {word:1,'guess_count':(1 - guess_count_mean) / guess_count_std}
+    series_list.append(pd.Series({x:predict_dict.get(x,int(0)) for x in X.columns}))
+
+
+predict_on_this = pd.DataFrame(series_list)
+
+top_15 = top_openers.head(15).reset_index(drop=True)
+top_15.loc[:,'estimated_fraction'] = r.predict(predict_on_this)
+top_15
+```
+
+This indicates that `adieu` represents about 3.8% of all starters. The infamous wordle 258 implies it's more like 6%, but we've seen it less than 6% even with more possible words. It could be that wordle 258 was something of an outlier, or the sample of tweets we have for it isn't represenative.
+
+### CRANE
+
+On February 6, 3Blue1Brown released a video positing that [CRANE was the best opener](https://www.youtube.com/watch?v=v68zYyaEmEA). Though this was later [recanted](https://www.youtube.com/watch?v=fRed0Xmc2Wg), it generated plenty of [media](https://kotaku.com/wordle-starting-word-math-science-bot-algorithm-crane-p-1848496404) [coverage](https://www.forbes.com/sites/paultassi/2022/02/08/the-best-wordle-starter-word-a-first-guess-through-science/?sh=94c150a27909). CRANE was #3 on my list overall, how does it look before and after the video?
+
+
+```{python}
+data_recent = one_hot_encoded_data.query('wordle_num > 232')
+X= data_recent.drop(
+        columns=[ 'score_count_fraction', 'wordle_num']) # fit to the one hot encouded guesses and the total guess count
+y=data_recent['score_count_fraction'] # our dependent is the fraction of guesses that had the score pattern
+
+r = linear_model.Ridge(alpha=10)
+r.fit(X,y)
+
+
+
+pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
+         columns=['coef', 'variable']).sort_values('coef',ascending=False).head(10)
+```
+
+CRANE is #5. What about before wordle 233?
+
+
+```{python}
+data_past = one_hot_encoded_data.query('wordle_num <= 232')
+X= data_past.drop(
+        columns=[ 'score_count_fraction', 'wordle_num']) # fit to the one hot encouded guesses and the total guess count
+y=data_past['score_count_fraction'] # our dependent is the fraction of guesses that had the score pattern
+
+r = linear_model.Ridge(alpha=10)
+r.fit(X,y)
+
+
+
+
+out = pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
+         columns=['coef', 'variable']).sort_values('coef',ascending=False)
+out['guess_rank'] = out['coef'].rank(ascending=False)
+out.query('variable == "crane"')
+```
+
+Prior to Wordle 233, CRANE ranked 1018! Quite the turnaround. (Alpha values may not be optimal for these smaller sample sizes) You can see this even in the cruder analysis, where the ranks for CRANE were much lower in the past.
+
+
+```{python}
+
+
+guess = 'crane'
+myplot = df.query(f'guess == @guess').sort_values(
+    'wordle_num').plot.scatter(
+        x='wordle_num',
+        y='score_count_fraction',
+        color='guess_count',
+        title=f'{guess.upper()} popularity',backend='plotly',
+        color_continuous_scale='bluered',
+    )
+myplot.update_yaxes(autorange="reversed")
+```
