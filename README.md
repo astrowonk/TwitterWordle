@@ -1,6 +1,8 @@
 # Wordle inferred from Twitter shared results.
 
-(See also, [Most Popular Wordle Openers Analysis](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb))
+See my [Most Popular Wordle Openers Analysis](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb)
+
+or check out the [Quarto Rendered HTML version of the Wordle Opener analysis](https://marcoshuerta.com/wordle_openers/)
 
 ### The Notebooks: 
 
