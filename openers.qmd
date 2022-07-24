@@ -66,29 +66,32 @@ We have a large dataframe of almost 600,000 columns. One row for every pattern a
 df.groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
 ```
 
-This analysis leaves a lot to be desired. While other evidence indicates `adieu` is a popular opener, it does not seem like `jazzy` would be one. Or for that matter, words with a `z`. 
+This analysis leaves a lot to be desired. While other evidence indicates `adieu` is a popular opener, it does not seem like `quaff` would be one. Plus, there are numerous words ending in `-aze`.
 
-The `00000` all grey pattern is fairly common, so words with uncommon letters will show up a lot since `00000` is common because of the sheer volume of words that can create the pattern. So what happens if we  filter out the null score? Not much...
+The `00000` all grey pattern is fairly common, so words with uncommon letters will show up a lot since `00000` is common because of the sheer volume of words that can create the pattern. So what happens if we  filter out the null score? 
 
 ```{python}
 df.query("score != '00000'").groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
 ```
 
-So are people guessing `braze` first regularly or is something else going on? BRAZE's score line is common but what other words could make the same patern? 
+The braze craze continues. So are people guessing `braze` regularly or is something else going on? BRAZE's score line is common but what other words could make the same patern? 
 
 ```{python}
 df.query('score == "00101" and wordle_num == 230').sort_values('commonality',ascending=False).head(10)
 ```
 
-There are a lot of words that make the same pattern, is `BRAZE` popular or is it riding the coattails of some other `_RA_E` word?
+There are a lot of other words that make the same pattern, is `BRAZE` popular or is it riding the coattails of some other `_RA_E` word?
 
 ### Linear Regression
 
-A better approach is to control for the presence of other words. If BRAZE only does well when it's paired with GRACE or GRADE or SHARE than a linear regression should isolate the guesses that actually are predictive of a popular score count line. But, there will be a lot of colinearity so we will use a Ridge regression.
+A better approach is to control for the presence of other words. If BRAZE only does well when it's paired with GRACE or GRADE or SHARE than a linear regression should isolate the guesses that actually are predictive of a popular score count line. Since I'm trying to account for colinearity, I will use a Ridge regression.
 
-The difficulty comes from getting the dataframe into the right format, thankfully I discovered [pd.crosstab](https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html), and there are [other methods that were all better](https://stackoverflow.com/questions/46791626/one-hot-encoding-multi-level-column-data) than what I had been doing originally (an awful groupby loop than took over a minute.)
+One difficulty came from getting the dataframe into the right format. I want one row per wordle number / score pattern, with each possible guess a column of 1 or 0. The "dependent" is the fraction of all tweeted opening score patterns that match that pattern. (e.g. for wordle 230 what fraction of all tweeted scores started 🟨🟩⬜⬜🟨). Another feature is the number of words that could produce that pattern.
 
-I normalize the data a little and then fit a model. I will use a [Ridge](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification) which helps control the size of the coefficients, and is neccessary to handle the colinearity of the variables.
+Thankfully I discovered [pd.crosstab](https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html), and there are [other methods that were all better](https://stackoverflow.com/questions/46791626/one-hot-encoding-multi-level-column-data) than what I had been doing originally (an awful groupby loop than took over a minute.)
+
+I normalize the data a little and then fit a model across all the word features as well as guess count. The [Ridge](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification) helps control the size of the coefficients, and is neccessary to handle the colinearity of the variables.
+
 
 ```{python}
 df.rename(columns={'score': 'score_pattern'}, inplace=True)
