@@ -41,9 +41,9 @@ TDLR; the most common openers are below, though bear in mind even the top choice
 
 
 ### Load and prep the data
-Most of the functionality used is in the files `first_word.py`. The function `make_first_guess_list` creates a useful dataframe for analysis.
+Most of the functionality used is in the files [first_word.py](https://github.com/astrowonk/TwitterWordle/blob/main/first_word.py). The function `make_first_guess_list` creates a useful dataframe for analysis.
 
-I start with the excellent kaggle data set [wordle-tweets](https://www.kaggle.com/benhamner/wordle-tweets) and extract directly from the zipfile which I download with the [kaggle api](https://github.com/Kaggle/kaggle-api). The `get_first_words` function processes the dataframe:
+I start with the very useful kaggle data set [wordle-tweets](https://www.kaggle.com/benhamner/wordle-tweets) and extract directly from the zipfile which I download with the [kaggle api](https://github.com/Kaggle/kaggle-api). The `get_first_words` function processes the dataframe:
 
 1. It removes tweeted scores that contain an invalid score line for that answer (likely played on a cached version of the puzzle, not the live one on the NY Times site).
 2. It removes any tweets that have more than 6 score patterns.
