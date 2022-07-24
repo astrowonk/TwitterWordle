@@ -41,7 +41,7 @@ TDLR; the most common openers are below, though bear in mind even the top choice
 
 
 ### Load and prep the data
-Most of the functionality used is in the files [first_word.py](https://github.com/astrowonk/TwitterWordle/blob/main/first_word.py). The function `make_first_guess_list` creates a useful dataframe for analysis.
+The function `make_first_guess_list` creates a useful dataframe for analysis. It, and most other helper utilities are in the [first_word.py](https://github.com/astrowonk/TwitterWordle/blob/main/first_word.py) file.
 
 I start with the very useful kaggle data set [wordle-tweets](https://www.kaggle.com/benhamner/wordle-tweets) and extract directly from the zipfile which I download with the [kaggle api](https://github.com/Kaggle/kaggle-api). The `get_first_words` function processes the dataframe:
 
