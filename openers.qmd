@@ -242,7 +242,7 @@ guess = 'crane'
 myplot = df.query(f'guess == @guess').sort_values(
     'wordle_num').plot.scatter(
         x='wordle_num',
-        y='score_count_fraction',
+        y='score_frequency_rank',
         color='guess_count',
         title=f'{guess.upper()} popularity',backend='plotly',
         color_continuous_scale='bluered',
