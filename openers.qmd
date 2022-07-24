@@ -12,10 +12,17 @@ execute:
   cache: true
 ---
 
+### Preface
+
+[Back to All Projects page](https://marcoshuerta.com/projects.html)
+
+[Twitterwordle Github Repository](https://github.com/astrowonk/TwitterWordle)
+
+_This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here.](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)_
+
 ### Introduction
 
 Wordle tweet data is a useful data source and can, for example, [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
-
 
 Analyzing the popularity of wordle openers is a little harder, since on any given day all we know are the most popular opening patterns. I used a Ridge linear regression to look for popular openers across multiple wordles.
 
@@ -249,3 +256,7 @@ myplot = df.query(f'guess == @guess').sort_values(
     )
 myplot.update_yaxes(autorange="reversed")
 ```
+
+[Back to All Projects page](https://marcoshuerta.com/projects.html)
+
+[Twitterwordle Github Repository](https://github.com/astrowonk/TwitterWordle)
