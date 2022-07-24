@@ -24,3 +24,6 @@ openers_files/*
 openers_files
 index.html
 .jupyter_cache/
+/.quarto/
+quarto_output/
+_freeze/

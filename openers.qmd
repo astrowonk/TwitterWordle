@@ -6,9 +6,9 @@ format:
     toc: true
     toc-location: left
     output-file: index.html
+
 jupyter: python3
 execute:
-  freeze: auto 
   cache: true
 ---
 
