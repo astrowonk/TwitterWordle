@@ -18,7 +18,7 @@ execute:
 
 [Twitterwordle Github Repository](https://github.com/astrowonk/TwitterWordle)
 
-_This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here.](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)_
+_This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
 ### Introduction
 
