@@ -1,3 +1,6 @@
 project:
   type: website
   output-dir: quarto_output
+  project:
+  render:
+    - openers.qmd

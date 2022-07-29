@@ -20,11 +20,11 @@ execute:
 
 _This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
-### Introduction
+### Introduction - What are the most popular Wordle openers? 
 
-Wordle tweet data is a useful data source and can, for example, [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
+We can find out the most popular Twitter Wordle openers from analyzing all of the shared wordle scores from Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
 
-Analyzing the popularity of wordle openers is a little harder, since on any given day all we know are the most popular opening patterns. I used a Ridge linear regression to look for popular openers across multiple wordles.
+Analyzing the *popularity* of wordle openers is a little harder, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time.
 
 TDLR; the most common openers are below, though bear in mind even the top choice `adieu` is estimated to be only 1.2-5% of all openers. 
 
@@ -67,7 +67,7 @@ df
 
 ### Simple analysis
 
-We have a large dataframe of almost 600,000 columns. One row for every pattern and every guess for every wordle answer. A simple way to look at common starter words would be to group by the guess and look which words consistently rank high across several days.
+We have a large dataframe of almost over a million rowss. One row for every pattern and every guess for every wordle answer. A simple way to look at common starter words would be to group by the guess and look which words consistently rank high across several days.
 
 ```{python}
 df.groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)

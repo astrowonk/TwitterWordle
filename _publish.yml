@@ -1,0 +1,6 @@
+- source: project
+  quarto-pub:
+    - id: 4e47a6be-6b3c-4876-b3dc-460accc7f3f3
+      url: 'https://quartopub.org/sites/marcos/twitterwordle'
+    - id: ef43be31-cf12-4a70-a2ef-65370f803e51
+      url: 'https://quartopub.org/sites/marcos/wordle_openers'
