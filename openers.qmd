@@ -20,13 +20,11 @@ execute:
 
 _This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
-### Introduction - What are the most popular Wordle openers? 
+### What are the most popular Wordle openers? 
 
-We can find out the most popular Twitter Wordle openers from analyzing all of the shared wordle scores from Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
+There has been a decent amount of analysis about the best Wordle opener. However, how can can we find out the most _popular_ Twitter Wordle openers? It is possible to do this by analyzing all of the shared wordle scores on Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day. 
 
-Analyzing the *popularity* of wordle openers is a little harder, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time.
-
-TDLR; the most common openers are below, though bear in mind even the top choice `adieu` is estimated to be only 1.2-5% of all openers. 
+Analyzing the *popularity* of wordle openers is a little harder, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time. This worked! So, TDLR; the most common openers are below, though bear in mind even the top choice `adieu` is estimated to be only ~3-5% of all openers. 
 
 1. adieu
 2. audio 
@@ -42,9 +40,7 @@ TDLR; the most common openers are below, though bear in mind even the top choice
 12. arose
 13. steam
 14. soare
-15. share ^[Possible false positive from _soare_]
-
-
+15. share ^[Possible false positive from _soare_ and _stare_]
 
 
 ### Load and prep the data
