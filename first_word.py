@@ -29,7 +29,11 @@ def better_wordle_solutions():
     new_dict = pd.read_json("../wordle_public/better_history.json").set_index(
         'wordle_num')['word'].to_dict()
     wordle_lookup.update(new_dict)
-    wordle_lookup.update({335: 'gamer'})
+    wordle_lookup.update({
+        335: 'gamer',
+        401: 'elope',
+        402: 'cinch',
+    })
     return wordle_lookup
 
 
