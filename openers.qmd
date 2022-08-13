@@ -144,9 +144,12 @@ r.alpha_
 Now we can look at the variable coefficients to see which words most strongly predict a popular pattern. The top few guesses contain [some](https://yougov.co.uk/topics/entertainment/articles-reports/2022/02/03/wordle-starter-words-hard-mode-and-x6-how-are-brit) [familiar](https://today.yougov.com/topics/lifestyle/articles-reports/2022/02/18/wordle-willingness-to-pay-poll) choices. 
 
 ```{python}
+from IPython.display import display, HTML
+
 top_openers = pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
          columns=['coef', 'variable']).sort_values('coef',ascending=False)
-top_openers.head(15)
+
+display(HTML(top_openers.head(15).to_html(index=False)))
 
 top_openers_list = top_openers.query('variable != "guess_count"')['variable'].head(15).tolist()
 ```
