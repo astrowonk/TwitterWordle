@@ -39,6 +39,7 @@ def better_wordle_solutions():
         335: 'gamer',
         401: 'elope',
         402: 'cinch',
+        420: 'hunky'
     })
     return wordle_lookup
 

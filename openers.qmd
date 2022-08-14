@@ -27,7 +27,7 @@ There has been a fair bit of analysis about the best Wordle opener. However, how
 
 Analyzing the *popularity* of wordle openers is more difficult, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time, treating each guess as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
-TDLR: the most common openers are below. Bear in mind, even the top choice `adieu` is estimated to be only ~3-4% of all openers. 
+TDLR: the most common openers are below for wordles between ${the_dates[0]} and ${the_dates[1]}. However, even the top choice `adieu` is estimated to be only ~3-4% of all openers. 
 
 1. ${my_output[0]}
 2. ${my_output[1]} 
@@ -61,8 +61,18 @@ I start with the very useful kaggle data set [wordle-tweets](https://www.kaggle.
 from first_word import make_first_guest_list,format_df
 
 import pandas as pd
+
+import datetime
+wordle_start = datetime.datetime(2021, 6, 19)
+now = datetime.datetime.now()
+
+
+mapping_date_dict = {wordle_id: wordle_start+datetime.timedelta(days=wordle_id) for wordle_id in range(210,500)}
+
+
+
 df = make_first_guest_list()
-format_df(df.head(10))
+format_df(df.sample(10))
 ```
 
 ## Simple analysis
@@ -130,6 +140,10 @@ from sklearn import linear_model
 from tweet_script import today_wordle_num
 lookback_num = today_wordle_num() - 90
 data = one_hot_encoded_data.query("wordle_num != 258 and wordle_num > @lookback_num ") #explained further down, this data point has particularly bad colinearity issues
+end_date = mapping_date_dict[data['wordle_num'].max()].strftime("%B %-d, %Y")
+begin_date = mapping_date_dict[data['wordle_num'].min()].strftime("%B %-d, %Y")
+
+
 X= data.drop(
         columns=[ 'score_count_fraction', 'wordle_num','score_pattern']) # fit to the one hot encoded guesses and the total guess count
 y=data['score_count_fraction'] # our dependent is the fraction of guesses that had the score pattern
@@ -160,6 +174,7 @@ top_openers_list = top_openers.query('variable != "guess_count"')['variable'].he
 #| error: false
 #| output: false
 ojs_define(my_output = top_openers_list)
+ojs_define(the_dates = [begin_date,end_date])
 
 ```
 
@@ -167,7 +182,7 @@ ojs_define(my_output = top_openers_list)
 
 ### Just how popular is _adieu_?
 
-Ok, so _adieu_ is popular but exactly how many people are actually using it every day? To answer this, I looked at what fraction of all tweeted score patterns are consistent with `adieu` and plot that against how many other words could have also made that pattern.
+Ok, so _adieu_ is popular but exactly how many people are actually using it every day? Below, I look at what fraction of all tweeted score patterns are consistent with `adieu` and plot that against how many *other* words could have also made that pattern.
 
 ```{python}
 guess = 'adieu'
@@ -185,7 +200,7 @@ df.query(f'guess == @guess and guess_count < 400').sort_values(
 
 So in the real data, the minimum fraction that was `adieu` was about 4%. 
 
-We have a fitted Ridge model, we can use it to predict what `adieu` (and all the other top choices) would do with a guess count of 1 and where `adieu` was the only word that could make it. (Which is not that different than the coefficients themselves.)
+However, I have the fitted Ridge model, and I can use it to predict what `adieu` (and all the other top choices) would do with a guess count of 1 and where `adieu` was the only word that could make it. (Which I believe is the same as the the coefficient plus the intercept.)
 
 
 ```{python}
@@ -203,7 +218,7 @@ top_15.loc[:,'estimated_fraction'] = r.predict(predict_on_this)
 top_15
 ```
 
-This indicates that `adieu` represents about 3.8% of all starters. The infamous wordle 258 implies it's more like 6%, but we've seen it less than 6% even with more possible words. It could be that wordle 258 was something of an outlier, or the sample of tweets we have for it isn't represenative.
+This indicates that `adieu` represents about 3.8% of all starters.
 
 ## CRANE
 
@@ -253,5 +268,6 @@ myplot.update_yaxes(autorange="reversed")
 
 ```{ojs}
 //| echo: false
+//| output: false
 viewof something = 1
 ```
