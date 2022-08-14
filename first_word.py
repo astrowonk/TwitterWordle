@@ -2,11 +2,17 @@ import pandas as pd
 from TwitterWordle import TwitterWordle, check_match
 from helper import get_num_line, stringify, make_freqs
 import zipfile
+from IPython.display import display, HTML
 
 import json
 import config
 
 image_mapping_dict = {1: "🟨", 0: "⬜", 2: "🟩"}
+
+
+def format_df(df):
+    """format the dataframe for display without index"""
+    display(HTML(df.to_html(index=False)))
 
 
 def map_to_emoji(pattern):

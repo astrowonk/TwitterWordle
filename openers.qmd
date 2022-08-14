@@ -58,11 +58,11 @@ I start with the very useful kaggle data set [wordle-tweets](https://www.kaggle.
 5. It groups by the answer for the day, and creates a dataframe that has score, target, guess, and some data on how popular that score is.
 
 ```{python}
-from first_word import make_first_guest_list
+from first_word import make_first_guest_list,format_df
 
 import pandas as pd
 df = make_first_guest_list()
-df
+format_df(df.head(10))
 ```
 
 ## Simple analysis
@@ -84,7 +84,7 @@ df.query("score != '00000'").groupby('guess')['score_frequency_rank'].mean().sor
 The braze craze continues. So are people guessing `braze` regularly or is something else going on? BRAZE's score line is common but what other words could make the same patern? 
 
 ```{python}
-df.query('score == "00101" and wordle_num == 230').sort_values('commonality',ascending=False).head(10)
+format_df(df.query('score == "00101" and wordle_num == 230').sort_values('commonality',ascending=False).head(10))
 ```
 
 There are many other words that make the same pattern. `BRAZE` could be popular or perhaps it is riding the coattails of some other `_RA_E` word?
@@ -146,8 +146,8 @@ Now we can look at the variable coefficients to see which words most strongly pr
 ```{python}
 from IPython.display import display, HTML
 
-top_openers = pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
-         columns=['coef', 'variable']).sort_values('coef',ascending=False)
+top_openers = pd.DataFrame(list(zip(r.feature_names_in_,r.coef_)),
+         columns=['variable', 'coef']).sort_values('coef',ascending=False)
 
 display(HTML(top_openers.head(15).to_html(index=False)))
 
@@ -225,7 +225,7 @@ r.fit(X,y)
 out = pd.DataFrame(list(zip(r.coef_, r.feature_names_in_)),
          columns=['coef', 'variable']).sort_values('coef',ascending=False)
 out['guess_rank'] = out['coef'].rank(ascending=False)
-out.query('variable == "crane"')
+format_df(out.query('variable == "crane"'))
 ```
 
 Prior to Wordle 233, CRANE ranked 1018! Quite the turnaround. (Alpha values may not be optimal for these smaller sample sizes) You can see this even in the cruder analysis, where the ranks for CRANE were much lower in the past.
