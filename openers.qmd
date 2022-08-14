@@ -218,7 +218,14 @@ top_15.loc[:,'estimated_fraction'] = r.predict(predict_on_this)
 top_15
 ```
 
-This indicates that `adieu` represents about 3.8% of all starters.
+```{python}
+#| echo: false
+from IPython.display import display, Markdown
+display(Markdown(f"""
+This indicates that `adieu` represents about {top_15['estimated_fraction'].iloc[0]:.2%} of all starters.
+"""))
+```
+
 
 ## CRANE
 
