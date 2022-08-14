@@ -1,7 +1,7 @@
 import zipfile
 import pandas as pd
 from sqlalchemy import create_engine, types
-from first_word import get_first_words, wordle_lookup, make_first_guest_list
+from first_word import make_first_guest_list
 
 if __name__ == "__main__":
     df = make_first_guest_list()

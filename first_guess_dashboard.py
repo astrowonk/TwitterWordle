@@ -3,8 +3,8 @@ from dash import Dash, html, dcc, Input, Output, State, ALL, MATCH
 import dash_bootstrap_components as dbc
 import dash_dataframe_table
 from sqlalchemy import create_engine
-from first_word import map_to_emoji, wordle_lookup
-from helper import make_freqs, flatten_columns
+from first_word import map_to_emoji, better_wordle_solutions
+from helper import flatten_columns
 from ast import literal_eval
 
 import pandas as pd
@@ -12,6 +12,7 @@ pd.DataFrame.flatten_columns = flatten_columns
 import numpy as np
 pd.options.plotting.backend = 'plotly'
 
+wordle_lookup = better_wordle_solutions()
 sql_db = create_engine('sqlite:///wordle_first_words.db')
 
 all_guesses = pd.read_sql("select distinct guess from main; ",
