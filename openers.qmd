@@ -27,7 +27,7 @@ There has been a fair bit of analysis about the best Wordle opener. However, how
 
 Analyzing the *popularity* of wordle openers is more difficult, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time, treating each guess as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
-TDLR: the most common openers are below for wordles between ${the_dates[0]} and ${the_dates[1]}. However, even the top choice `adieu` is estimated to be only ~3-4% of all openers. 
+TDLR: the most common openers are below for wordles between ${the_dates[0]} and ${the_dates[1]}. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could produce the same pattern as adieu). 
 
 1. ${my_output[0]}
 2. ${my_output[1]} 
@@ -103,7 +103,7 @@ There are many other words that make the same pattern. `BRAZE` could be popular 
 
 A better approach is to control for the presence of other words. If BRAZE only does well when it's paired with GRACE or GRADE or SHARE than a linear regression should isolate the guesses that actually are predictive of a popular score count line. Since I'm trying to account for colinearity, I will use a Ridge regression.
 
-One difficulty came from getting the dataframe into the right format. I want one row per wordle number / score pattern, with each possible guess a column of 1 or 0. The "dependent" is the fraction of all tweeted opening score patterns that match that pattern. (e.g. for wordle 230 what fraction of all tweeted scores started 🟨🟩⬜⬜🟨). Another feature is the number of words that could produce that pattern.
+One difficulty came from getting the dataframe into the right format. I want one row per wordle number / score pattern, with each possible guess a column of 1 or 0. The "dependent" is the fraction of all tweeted opening score patterns that match that pattern. (e.g. for wordle 230 what fraction of all tweeted scores started `🟨🟩⬜⬜🟨`). Another feature is the number of words that could produce that pattern.
 
 I discovered [pd.crosstab](https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html), and there are [other methods that were all better](https://stackoverflow.com/questions/46791626/one-hot-encoding-multi-level-column-data) than what I had been doing originally (an awful groupby loop than took over a minute.)
 
@@ -123,6 +123,7 @@ one_hot_encoded_data.dropna(subset=['score_count_fraction'],inplace=True) #don't
 # actually not sure if fillna 0 would be better?
 std = one_hot_encoded_data['score_count_fraction'].std()
 
+one_hot_encoded_data['guess_count_orig'] = one_hot_encoded_data['guess_count']
 guess_count_std = one_hot_encoded_data[
     'guess_count'].std()
 guess_count_mean = one_hot_encoded_data['guess_count'].mean()
@@ -145,7 +146,7 @@ begin_date = mapping_date_dict[data['wordle_num'].min()].strftime("%B %-d, %Y")
 
 
 X= data.drop(
-        columns=[ 'score_count_fraction', 'wordle_num','score_pattern']) # fit to the one hot encoded guesses and the total guess count
+        columns=[ 'score_count_fraction', 'wordle_num','score_pattern','guess_count_orig'],errors='ignore') # fit to the one hot encoded guesses and the total guess count
 y=data['score_count_fraction'] # our dependent is the fraction of guesses that had the score pattern
 
 r = linear_model.RidgeCV(alphas=[5,10,15])
@@ -186,7 +187,7 @@ Ok, so _adieu_ is popular but exactly how many people are actually using it ever
 
 ```{python}
 guess = 'adieu'
-df.query(f'guess == @guess and guess_count < 400').sort_values(
+df.query(f'guess == @guess and guess_count < 400 and wordle_num > @lookback_num').sort_values(
     'wordle_num').plot.scatter(
         x='guess_count',
         y='score_count_fraction',
@@ -198,7 +199,7 @@ df.query(f'guess == @guess and guess_count < 400').sort_values(
     )
 ```
 
-So in the real data, the minimum fraction that was `adieu` was about 4%. 
+So in the data for adieum, the minimum fraction that could be `adieu` was about 6%, with wordle 344 indicating maybe as high as 7.5%. 
 
 However, I have the fitted Ridge model, and I can use it to predict what `adieu` (and all the other top choices) would do with a guess count of 1 and where `adieu` was the only word that could make it. (Which I believe is the same as the the coefficient plus the intercept.)
 
@@ -215,16 +216,51 @@ predict_on_this = pd.DataFrame(series_list)
 
 top_15 = top_openers.head(15).reset_index(drop=True)
 top_15.loc[:,'estimated_fraction'] = r.predict(predict_on_this)
-top_15
+format_df(top_15.reset_index(),formatters={'estimated_fraction':'{:,.2%}'.format})
 ```
 
 ```{python}
 #| echo: false
 from IPython.display import display, Markdown
 display(Markdown(f"""
-This indicates that `adieu` represents about {top_15['estimated_fraction'].iloc[0]:.2%} of all starters.
+This indicates that `adieu` represents about {top_15['estimated_fraction'].iloc[0]:.2%} of all starters. This is considerably lower than looking at the score count fraction graph. The Ridge model does seem to find the correct top openers, but is performing poorly at the actual frequency of the most common openers, and at predicting the score when the total number of guesses that can make a pattern approaches 1.
 """))
 ```
+From additional inspection of the errors, I would say the model is off by almost a factor of two when estimating the commonality of the most common openers.
+
+```{python}
+new_df = X.copy()
+new_df['predicted_score_count_fraction'] = r.predict(X)
+new_df = new_df.join(data[[
+    'score_count_fraction', 'wordle_num', 'score_pattern', 'guess_count_orig'
+]])
+new_df['score_count_error'] = (
+    new_df['score_count_fraction'] -
+    new_df['predicted_score_count_fraction']) / new_df['score_count_fraction']
+
+new_df.query(
+    'guess_count_orig < 20 and score_count_fraction > .01').plot.scatter(
+        x='guess_count_orig',
+        y='score_count_error',
+        trendline='ols',
+        labels={
+            'score_count_error':
+            'Score Count Error (Fractional)',
+            'guess_count_orig': "Guess Count"
+        },
+        hover_data={
+            'score_pattern': True,
+            'wordle_num': True,
+            'predicted_score_count_fraction': ':.3f',
+            'score_count_fraction': ':.3f',
+            'score_count_error': ':.4f'
+        },
+    )
+
+
+```
+
+
 
 
 ## CRANE

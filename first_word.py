@@ -10,9 +10,9 @@ import config
 image_mapping_dict = {1: "🟨", 0: "⬜", 2: "🟩"}
 
 
-def format_df(df):
+def format_df(df,**kwargs):
     """format the dataframe for display without index"""
-    display(HTML(df.to_html(index=False)))
+    display(HTML(df.to_html(index=False,**kwargs)))
 
 
 def map_to_emoji(pattern):
