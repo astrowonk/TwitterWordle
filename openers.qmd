@@ -3,6 +3,7 @@ title: "Most Popular Wordle Openers"
 format:
   html:
     code-fold: true
+    code-tools: true
     toc: true
     toc-depth: 4
     toc-location: left
@@ -56,6 +57,7 @@ I start with the very useful kaggle data set [wordle-tweets](https://www.kaggle.
 3. It extracts the first pattern from the tweeted scores.
 4. It maps on the answer for a given wordle id.
 5. It groups by the answer for the day, and creates a dataframe that has score, target, guess, and some data on how popular that score is.
+6. Colored squares are mapped to numbers. So a score of `🟨🟩⬜⬜🟩` becomes `12002`.
 
 ```{python}
 from first_word import make_first_guest_list,format_df
@@ -310,6 +312,7 @@ myplot.update_yaxes(autorange="reversed")
 
 
 ```{ojs}
+//| code-fold: false
 //| echo: false
 //| output: false
 viewof something = 1
