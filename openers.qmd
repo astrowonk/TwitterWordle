@@ -79,7 +79,7 @@ format_df(df.sample(10))
 
 ## Simple analysis
 
-We have a large dataframe of almost over a million rowss. One row for every pattern and every guess for every wordle answer. A simple way to look at common starter words would be to group by the guess and look which words consistently rank high across several days.
+The large dataframe contains I have created has one row for every pattern and guess for every wordle answer. A simple way to look at common starter words would be to group by the opener and look which openers consistently rank high across several days.
 
 ```{python}
 df.groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
@@ -93,7 +93,7 @@ The `00000` all grey pattern is fairly common, so words with uncommon letters wi
 df.query("score != '00000'").groupby('guess')['score_frequency_rank'].mean().sort_values().head(10)
 ```
 
-The braze craze continues. So are people guessing `braze` regularly or is something else going on? BRAZE's score line is common but what other words could make the same patern? 
+The braze craze continues. Are people guessing `braze` regularly or is something else going on? BRAZE's score line is common but what other words could make the same pattern? 
 
 ```{python}
 format_df(df.query('score == "00101" and wordle_num == 230').sort_values('commonality',ascending=False).head(10))
