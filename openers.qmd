@@ -26,7 +26,7 @@ _This is a [Quarto](https://quarto.org) version of [my original jupyter notebook
 
 There has been a fair bit of analysis about the best Wordle opener. However, how can can we figure out the most _popular_ Twitter Wordle openers? I have attempted to do this by analyzing large samples of shared wordle scores on Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day.
 
-Analyzing the *popularity* of wordle openers is more difficult, since on any given day all we know are the most popular opening _patterns_. I used a Ridge linear regression to look for popular openers across a long stretch of time, treating each guess as a feature/column. The words with the largest coefficients should be the most popular openers. 
+Analyzing the popularity of wordle openers based on shared scores is difficult, since on any given day all we know are the most popular opening _patterns_, e.g. `🟨🟩⬜⬜🟩`. I use a Ridge linear regression to look for popular openers across 90 days, treating each possible opener as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
 TDLR: the most common openers are below for wordles between ${the_dates[0]} and ${the_dates[1]}. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as adieu). 
 
@@ -201,7 +201,7 @@ df.query(f'guess == @guess and guess_count < 400 and wordle_num > @lookback_num'
     )
 ```
 
-So in the data for adieum, the minimum fraction that could be `adieu` was about 6%, with wordle 344 indicating maybe as high as 7.5%. 
+So in the data for `adieu`, the minimum fraction that could be `adieu` was about 6% (Wordle 206), with Wordle 344 indicating maybe as high as 7.5%. 
 
 However, I have the fitted Ridge model, and I can use it to predict what `adieu` (and all the other top choices) would do with a guess count of 1 and where `adieu` was the only word that could make it. (Which I believe is the same as the the coefficient plus the intercept.)
 
