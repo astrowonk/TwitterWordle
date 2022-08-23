@@ -1,12 +1,10 @@
 # Wordle inferred from Twitter shared results.
 
-See my [Most Popular Wordle Openers Analysis](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb)
-
-or check out the [Quarto Rendered HTML version of the Wordle Opener analysis](https://marcoshuerta.com/wordle_openers/)
+This repository started exclusively as an effort to 'solve' the daily wordle with only shared scores on Twitter. However, I have also analyzed the [Most Popular Wordle Openers Analysis](https://marcoshuerta.com/wordle_openers/) using Twitter data.
 
 ### The Notebooks: 
 
-More details in the Jupyter Notetbooks:
+More details on Solving Wordle with tweets in the Jupyter Notetbooks:
 
 [Predict from Tweets](Predict%20with%20Tweets.ipynb)
 
