@@ -20,15 +20,15 @@ execute:
 
 [Twitterwordle Github Repository](https://github.com/astrowonk/TwitterWordle)
 
-_This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb), albeit using more recent data. See the [quarto .qmd source file here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
+_This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb). I plan to update this version regularly. See the [quarto .qmd source on Github here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
 ## What are the most popular Wordle openers? 
 
-There has been a fair bit of analysis about the best Wordle opener. However, how can can we figure out the most _popular_ Twitter Wordle openers? I have attempted to do this by analyzing large samples of shared wordle scores on Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day.
+There has been a fair bit of analysis as to what is the best Wordle opener. However, how can can we figure out the most _popular_ Twitter Wordle openers? I have attempted to do this by analyzing large samples of shared wordle scores on Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day.
 
 Analyzing the popularity of wordle openers based on shared scores is difficult, since on any given day all we know are the most popular opening _patterns_, e.g. `🟨🟩⬜⬜🟩`. I use a Ridge linear regression to look for popular openers across 90 days, treating each possible opener as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
-TDLR: the top 10 most common openers found through my method are below for Wordles between ${the_dates[0]} and ${the_dates[1]}. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as `adieu`). 
+TDLR: the top 10 most common openers found through this method are below. This covers Wordles between ${the_dates[0]} and ${the_dates[1]}. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as `adieu`). 
 
 1. ${my_output[0]}
 2. ${my_output[1]} 
@@ -42,9 +42,9 @@ TDLR: the top 10 most common openers found through my method are below for Wordl
 10. ${my_output[9]}
 
 
-The top three I found through tweet analysis is consistent with the Top 3 the NYT's "[Wordlebot](https://www.nytimes.com/interactive/2022/upshot/wordle-bot.html)" now reports on their own site:
+The top three of the list above are consistent with the top 3 that the NYT "[Wordlebot](https://www.nytimes.com/interactive/2022/upshot/wordle-bot.html)" reports.
 
-![Elephant](nyt_opener_stats.png)
+![NYT Opener statistics](nyt_opener_stats.png)
 
 
 ## Load and prep the data
