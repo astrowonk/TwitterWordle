@@ -28,7 +28,7 @@ There has been a fair bit of analysis as to what is the best Wordle opener. Howe
 
 Analyzing the popularity of wordle openers based on shared scores is difficult, since on any given day all we know are the most popular opening _patterns_, e.g. `🟨🟩⬜⬜🟩`. I use a Ridge linear regression to look for popular openers across 90 days, treating each possible opener as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
-TDLR: the top 10 most common openers found through this method are below. This covers Wordles between ${the_dates[0]} and ${the_dates[1]}. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as `adieu`). 
+TDLR: the top 10 most common openers found through this method are below. This covers Wordles between <strong> ${the_dates[0]} </strong> and <strong> ${the_dates[1]} </strong>. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as `adieu`). 
 
 1. ${my_output[0]}
 2. ${my_output[1]} 
