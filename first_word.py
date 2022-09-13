@@ -35,11 +35,17 @@ def better_wordle_solutions():
     new_dict = pd.read_json("../wordle_public/better_history.json").set_index(
         'wordle_num')['word'].to_dict()
     wordle_lookup.update(new_dict)
-    wordle_lookup.update({  ## UPDATE THIS ASAP  
+    wordle_lookup.update({
         335: 'gamer',
         401: 'elope',
         402: 'cinch',
-        420: 'hunky'
+        420: 'hunky',
+        361: 'atone',
+        365: 'cacao',
+        368: 'gloat',
+        370: 'brink',
+        386: 'stead',
+        388: 'madam',
     })
     return wordle_lookup
 
