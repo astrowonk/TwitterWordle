@@ -10,9 +10,9 @@ import config
 image_mapping_dict = {1: "🟨", 0: "⬜", 2: "🟩"}
 
 
-def format_df(df,**kwargs):
+def format_df(df, **kwargs):
     """format the dataframe for display without index"""
-    display(HTML(df.to_html(index=False,**kwargs)))
+    display(HTML(df.to_html(index=False, **kwargs)))
 
 
 def map_to_emoji(pattern):
@@ -35,7 +35,7 @@ def better_wordle_solutions():
     new_dict = pd.read_json("../wordle_public/better_history.json").set_index(
         'wordle_num')['word'].to_dict()
     wordle_lookup.update(new_dict)
-    wordle_lookup.update({
+    wordle_lookup.update({  ## UPDATE THIS ASAP  
         335: 'gamer',
         401: 'elope',
         402: 'cinch',
