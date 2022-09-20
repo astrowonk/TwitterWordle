@@ -107,8 +107,8 @@ def get_first_words(df):
     return df_concat
 
 
-def make_first_guest_list():
-    with zipfile.ZipFile('wordle-tweets.zip') as myzip:
+def make_first_guest_list(myzipfile='wordle-tweets.zip'):
+    with zipfile.ZipFile(myzipfile) as myzip: #myzipfile can be a string of a file name or Bytes IO
         tweets = pd.read_csv(myzip.open('tweets.csv'))
     print(f"Max wordle num {tweets['wordle_id'].max()}")
     first_guess_list = get_first_words(tweets)
