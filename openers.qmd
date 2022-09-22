@@ -22,6 +22,9 @@ execute:
 
 _This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb). I plan to update this version regularly. See the [quarto .qmd source on Github here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
+_On September 1, 2022, The New York Times [published a piece](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html) anaylizing their own actual accurate data of openers. My analysis matches their for the top 4! Pretty good!_
+
+
 ## What are the most popular Wordle openers? 
 
 There has been a fair bit of analysis as to what is the best Wordle opener. However, how can can we figure out the most _popular_ Twitter Wordle openers? I have attempted to do this by analyzing large samples of shared wordle scores on Twitter. Previously, I have used tweeted wordle scores to [accurately predict](https://twitter.com/thewordlebot/status/1498661373626265600) the wordle solution for the day.
@@ -42,9 +45,9 @@ TDLR: the top 10 most common openers found through this method are below. This c
 10. ${my_output[9]}
 
 
-The top three of the list above are consistent with the top 3 that the NYT "[Wordlebot](https://www.nytimes.com/interactive/2022/upshot/wordle-bot.html)" reports.
+The top four of the list above are the same as New York Times' own data [written up on September 1.](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html)
 
-![NYT Opener statistics](nyt_opener_stats.png)
+![NYT Opener statistics](wordletop5-2-superJumbo-v2.png)
 
 
 ## Load and prep the data
