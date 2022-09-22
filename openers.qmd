@@ -22,7 +22,7 @@ execute:
 
 _This is a [Quarto](https://quarto.org) version of [my original jupyter notebook](https://github.com/astrowonk/TwitterWordle/blob/main/Popular%20Wordle%20Openers.ipynb). I plan to update this version regularly. See the [quarto .qmd source on Github here](https://github.com/astrowonk/TwitterWordle/blob/main/openers.qmd)._
 
-_On September 1, 2022, The New York Times [published a piece](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html) anaylizing their own actual accurate data of openers. My analysis matches their for the top 4! Pretty good!_
+_On September 1, 2022, The New York Times [published a piece](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html) on opener popularity, including publishing the top 5 most popular openers. My analysis matches their actual data for the top 3! Pretty good for looking at tweets!_
 
 
 ## What are the most popular Wordle openers? 
@@ -31,7 +31,7 @@ There has been a fair bit of analysis as to what is the best Wordle opener. Howe
 
 Analyzing the popularity of wordle openers based on shared scores is difficult, since on any given day all we know are the most popular opening _patterns_, e.g. `🟨🟩⬜⬜🟩`. I use a Ridge linear regression to look for popular openers across 90 days, treating each possible opener as a feature/column. The words with the largest coefficients should be the most popular openers. 
 
-TDLR: the top 10 most common openers found through this method are below. This covers Wordles between <strong> ${the_dates[0]} </strong> and <strong> ${the_dates[1]} </strong>. `Adieu` is estimated to be as high as 7.5% of all openers (based on Wordle 344 where only 1 other guess could have produced the same pattern as `adieu`). 
+TDLR: the top 10 most common openers found through this method are below. This covers Wordles between <strong> ${the_dates[0]} </strong> and <strong> ${the_dates[1]} </strong>. `Adieu` is estimated at 4% of all openers. (Actual New York Times statistics place it at 5%)
 
 1. ${my_output[0]}
 2. ${my_output[1]} 
