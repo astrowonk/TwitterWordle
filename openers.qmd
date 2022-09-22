@@ -45,7 +45,7 @@ TDLR: the top 10 most common openers found through this method are below. This c
 10. ${my_output[9]}
 
 
-The top four of the list above are the same as New York Times' own data [written up on September 1.](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html)
+The top three of the list above are the same as New York Times' own data [written up on September 1.](https://www.nytimes.com/2022/09/01/crosswords/wordle-starting-words-adieu.html). 
 
 ![NYT Opener statistics](wordletop5-2-superJumbo-v2.png)
 
