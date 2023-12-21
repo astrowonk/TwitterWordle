@@ -16,7 +16,7 @@ execute:
 
 ## Preface
 
-[Back to All Projects page](https://marcoshuerta.com/projects.html)
+[Back to All Projects page](https://marcoshuerta.com/projects/)
 
 [Twitterwordle Github Repository](https://github.com/astrowonk/TwitterWordle)
 
